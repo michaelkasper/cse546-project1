@@ -2,7 +2,7 @@
 const express = require('express');
 const multer = require('multer');
 const server = express();
-const PORT = 80;
+const PORT = 3000;
 
 // uploaded images are saved in the folder "/upload_images"
 const upload = multer({dest: __dirname + '/upload_images'});
