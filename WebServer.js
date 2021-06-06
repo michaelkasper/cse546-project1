@@ -1,29 +1,78 @@
-// we use express and multer libraries to send images
-const express = require('express');
-const multer = require('multer');
-const server = express();
-const PORT = 3000;
+require( 'dotenv' ).config();
 
-// uploaded images are saved in the folder "/upload_images"
-const upload = multer({dest: __dirname + '/upload_images'});
+const express      = require( 'express' );
+const addRequestId = require( 'express-request-id' )();
+const AWS          = require( 'aws-sdk' );
+const multer       = require( 'multer' );
+const multerS3     = require( 'multer-s3' );
+const { Consumer } = require( 'sqs-consumer' );
+const config       = require( './config' );
 
-server.use(express.static('public'));
+AWS.config.update( { region: config.AWS_REGION } );
 
-// "myfile" is the key of the http payload
-server.post('/', upload.single('myfile'), function(request, respond) {
-    if(request.file) console.log(request.file);
+const app = express();
+const s3  = new AWS.S3();
+const sqs = new AWS.SQS();
 
-    // save the image
-    var fs = require('fs');
-    fs.rename(__dirname + '/upload_images/' + request.file.filename, __dirname + '/upload_images/' + request.file.originalname, function(err) {
-        if ( err ) console.log('ERROR: ' + err);
-    });
+const pendingResponses = {};
+const sqsConsumer      = Consumer.create( {
+    sqs          : sqs,
+    queueUrl     : config.sqsOutputUrl,
+    handleMessage: async ( message ) => {
+        const { result, requestId, error } = JSON.parse( message.Body );
+        if ( requestId in pendingResponses ) {
+            const res = pendingResponses[ requestId ];
+            res.send( error ? "unknown error occurred" : result );
+            delete pendingResponses[ requestId ];
+        }
+    },
+} );
 
-    respond.end(request.file.originalname + ' uploaded!');
-});
+sqsConsumer.on( 'error', ( err ) => {
+    console.error( err.message );
+} );
 
-// You need to configure node.js to listen on 0.0.0.0 so it will be able to accept connections on all the IPs of your machine
-const hostname = '0.0.0.0';
-server.listen(PORT, hostname, () => {
-    console.log(`Server running at http://${hostname}:${PORT}/`);
-});
+sqsConsumer.on( 'processing_error', ( err ) => {
+    console.error( err.message );
+} );
+
+sqsConsumer.start();
+
+
+const upload = multer( {
+    storage: multerS3( {
+        s3    : s3,
+        bucket: config.s3Bucket,
+        acl   : 'bucket-owner-full-control',
+        key   : function ( req, file, cb ) {
+            const ext = file.originalname.split( '.' ).pop();
+            cb( null, `pending/${ req.id }.${ ext }` );
+        }
+    } )
+} );
+
+app.use( addRequestId );
+
+app.post( '/', upload.single( 'myfile' ), async ( req, res, next ) => {
+    try {
+        await sqs.sendMessage( {
+            MessageBody           : JSON.stringify( {
+                s3key    : req.file.key,
+                requestId: req.id
+            } ),
+            MessageDeduplicationId: req.id,
+            MessageGroupId        : 'input',
+            QueueUrl              : config.sqsInputUrl
+        } ).promise();
+
+        console.log( `SENT: ${ req.id }` );
+        pendingResponses[ req.id ] = res;
+    } catch ( error ) {
+        console.log( error );
+        res.send( "We ran into an error. Please try again." );
+    }
+} );
+
+app.listen( config.WEB_PORT, config.WEB_HOSTNAME, function () {
+    console.log( `Server running at http://${ config.WEB_HOSTNAME }:${ config.WEB_PORT }/` );
+} );
