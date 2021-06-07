@@ -112,7 +112,8 @@ const meta = new AWS.MetadataService();
                         Key   : s3key
                     } ).promise();
 
-                    await fs.writeFile( localPath, s3File.Body );
+                    const t = await fs.writeFile( localPath, s3File.Body );
+                    console.log( t );
 
                     const { stdout } = await spawn( 'python3', [ 'image_classification.py', localPath ], {
                         cwd    : config.scriptDir,
