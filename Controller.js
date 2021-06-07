@@ -10,6 +10,10 @@ const ec2 = new AWS.EC2();
 
     const config = await getConfig();
 
+    const log = ( message ) => {
+        config.debug && console.log( message );
+    }
+
     while ( true ) {
         const sqsAttributes = await sqs.getQueueAttributes( {
             QueueUrl      : config.sqsInputUrl,
@@ -58,7 +62,7 @@ const ec2 = new AWS.EC2();
 
                         count++;
                     } catch ( err ) {
-                        config.debug && console.log( 'create', err )
+                        log( 'create', err )
                     }
                 }
             }
@@ -70,7 +74,7 @@ const ec2 = new AWS.EC2();
         //     Prefix: "pending/"
         // } ).promise();
         //
-        // config.debug && console.log( pendingImages );
+        // log( pendingImages );
 
 
         await new Promise( r => setTimeout( r, 500 ) );

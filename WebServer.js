@@ -13,6 +13,14 @@ const sqs = new AWS.SQS();
 ( async () => {
     const config = await getConfig();
 
+    const log = ( message ) => {
+        config.debug && console.log( message );
+    }
+
+    const logError = ( message ) => {
+        config.debug && console.error( message );
+    }
+
     const pendingResponses = {};
     const sqsConsumer      = Consumer.create( {
         sqs          : sqs,
@@ -28,11 +36,11 @@ const sqs = new AWS.SQS();
     } );
 
     sqsConsumer.on( 'error', ( err ) => {
-        console.error( err.message );
+        logError( err.message );
     } );
 
     sqsConsumer.on( 'processing_error', ( err ) => {
-        console.error( err.message );
+        logError( err.message );
     } );
 
     sqsConsumer.start();
@@ -64,7 +72,7 @@ const sqs = new AWS.SQS();
                 QueueUrl              : config.sqsInputUrl
             } ).promise();
 
-            config.debug && console.log( `SENT: ${ req.id }` );
+            log( `SENT: ${ req.id }` );
             pendingResponses[ req.id ] = res;
         } catch ( error ) {
             config.debug && console.log( error );
@@ -73,7 +81,7 @@ const sqs = new AWS.SQS();
     } );
 
     app.listen( config.WEB_PORT, config.WEB_HOSTNAME, function () {
-        config.debug && console.log( `Server running at http://${ config.WEB_HOSTNAME }:${ config.WEB_PORT }/` );
+        log( `Server running at http://${ config.WEB_HOSTNAME }:${ config.WEB_PORT }/` );
     } );
 
 } )();

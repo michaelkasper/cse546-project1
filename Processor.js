@@ -14,6 +14,14 @@ const meta = new AWS.MetadataService();
 ( async () => {
     const config = await getConfig();
 
+    const log = ( message ) => {
+        config.debug && console.log( message );
+    }
+
+    const logError = ( message ) => {
+        config.debug && console.error( message );
+    }
+
     meta.request( "/latest/meta-data/instance-id", ( err, data ) => {
         const instanceId = data || uuid.v4();
 
@@ -34,7 +42,7 @@ const meta = new AWS.MetadataService();
                     await new Promise( r => setTimeout( r, 2000 ) );
                 }
             }, 300000 );
-            config.debug && console.log( `Timer set for 5min` );
+            log( `Timer set for 5min` );
         }
 
         const sqsConsumer = Consumer.create( {
@@ -45,10 +53,10 @@ const meta = new AWS.MetadataService();
 
                 if ( timer ) {
                     clearTimeout( timer );
-                    config.debug && console.log( `Clearing Timer` );
+                    log( `Clearing Timer` );
                 }
 
-                config.debug && console.log( `PROCESSING: ${ requestId }` );
+                log( `PROCESSING: ${ requestId }` );
 
 
                 const ext       = s3key.split( '.' ).pop();
@@ -67,7 +75,7 @@ const meta = new AWS.MetadataService();
                     const currentFlag = currentTags.find( tag => tag.Key === 'instance' );
                     if ( currentFlag ) {
                         // todo: validate instance is still active
-                        config.debug && console.log( `SKIPPING: ${ requestId }` );
+                        log( `SKIPPING: ${ requestId }` );
                         return;
                     }
 
@@ -95,12 +103,12 @@ const meta = new AWS.MetadataService();
 
                     const newFlag = newTags.find( tag => tag.Key === 'processing' );
                     if ( !newFlag || newFlag.Value !== instanceId ) {
-                        config.debug && console.log( `SKIPPING: ${ requestId }` );
+                        log( `SKIPPING: ${ requestId }` );
                         return;
                     }
 
                 } catch ( err ) {
-                    config.debug && console.log( 'flag start', err );
+                    log( 'flag start', err );
                     return true;
                 }
 
@@ -113,10 +121,8 @@ const meta = new AWS.MetadataService();
                     } ).promise();
 
                     await fs.writeFile( localPath, s3File.Body );
-                    
-                    console.log( config.scriptDir, localPath );
 
-                    const { stdout } = await spawn( 'python3', [ 'image_classification.py', localPath ], {
+                    const { stdout } = await spawn( 'sudo', [ 'python3', 'image_classification.py', localPath ], {
                         cwd    : config.scriptDir,
                         capture: [ 'stdout', 'stderr' ]
                     } );
@@ -125,9 +131,9 @@ const meta = new AWS.MetadataService();
                 } catch ( err ) {
                     if ( err.stderr ) {
                         //python error
-                        config.debug && console.log( 'python', err.stderr );
+                        log( 'python', err.stderr );
                     }
-                    config.debug && console.log( 'process', err );
+                    log( 'process', err );
                     error = true;
                 }
 
@@ -141,7 +147,7 @@ const meta = new AWS.MetadataService();
                         QueueUrl              : config.sqsOutputUrl
                     } ).promise()
                 } catch ( error ) {
-                    config.debug && console.log( 'message', error );
+                    log( 'message', error );
                 }
 
 
@@ -159,7 +165,7 @@ const meta = new AWS.MetadataService();
                         }
                     } ).promise();
                 } catch ( error ) {
-                    config.debug && console.log( 'flag complete', error );
+                    log( 'flag complete', error );
                 }
 
                 // cleanup
@@ -172,7 +178,7 @@ const meta = new AWS.MetadataService();
                         } ).promise()
                     ] );
                 } catch ( err ) {
-                    config.debug && console.log( 'cleanup', err );
+                    log( 'cleanup', err );
                 }
 
 
@@ -183,11 +189,11 @@ const meta = new AWS.MetadataService();
         } );
 
         sqsConsumer.on( 'error', ( err ) => {
-            console.error( err.message );
+            logError( err.message );
         } );
 
         sqsConsumer.on( 'processing_error', ( err ) => {
-            console.error( err.message );
+            logError( err.message );
         } );
 
         setTimer();
