@@ -171,7 +171,7 @@ const meta = new AWS.MetadataService();
 
                         await new Promise( r => setTimeout( r, 2000 ) );
                     }
-                }, 500000 );
+                }, 300000 );
 
                 return true;
             },
