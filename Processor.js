@@ -5,21 +5,26 @@ const uuid         = require( 'uuid' );
 const fs           = require( 'fs' ).promises;
 const spawn        = require( 'child-process-promise' ).spawn;
 const { join }     = require( 'path' );
+const os           = require( "os" );
 
 const s3   = new AWS.S3();
 const sqs  = new AWS.SQS();
 const ec2  = new AWS.EC2();
 const meta = new AWS.MetadataService();
 
+const userInfo = os.userInfo();
+
+console.log( userInfo );
+
 ( async () => {
     const config = await getConfig();
 
     const log = ( ...args ) => {
-        config.debug && console.log( args );
+        config.debug && console.log( ...args );
     }
 
     const logError = ( ...args ) => {
-        config.debug && console.error( args );
+        config.debug && console.error( ...args );
     }
 
     meta.request( "/latest/meta-data/instance-id", ( err, data ) => {
@@ -123,7 +128,7 @@ const meta = new AWS.MetadataService();
                     await fs.writeFile( localPath, s3File.Body );
 
 
-                    const { stdout: stdout1 } = await spawn( 'whoami', {
+                    const { stdout: stdout1 } = await spawn( 'who', {
                         cwd    : config.scriptDir,
                         capture: [ 'stdout', 'stderr' ]
                     } );
