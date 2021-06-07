@@ -32,7 +32,7 @@ const ec2 = new AWS.EC2();
                     IamInstanceProfile: "arn:aws:iam::415900791134:instance-profile/CSE546-Webapp",
                     MinCount          : 1,
                     MaxCount          : 1,
-                    UserData          : new Buffer( bootScript ).toString( 'base64' )
+                    UserData          : Buffer.from( bootScript ).toString( 'base64' )
                 } ).promise();
                 const newInstanceId = result.Instances[ 0 ].InstanceId;
 
