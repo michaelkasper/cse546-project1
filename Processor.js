@@ -5,7 +5,6 @@ const uuid         = require( 'uuid' );
 const fs           = require( 'fs' ).promises;
 const spawn        = require( 'child-process-promise' ).spawn;
 const { join }     = require( 'path' );
-const os           = require( "os" );
 
 const s3   = new AWS.S3();
 const sqs  = new AWS.SQS();
