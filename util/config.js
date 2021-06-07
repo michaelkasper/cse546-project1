@@ -10,7 +10,8 @@ const {
           AWS_S3_BUCKET,
           AWS_EC2_AMI,
           AWS_EC2_KEYNAME,
-          AWS_EC2_SECURITY_GROUPID,
+          AWS_EC2_WEB_SECURITY_GROUPID,
+          AWS_EC2_PROCESSOR_SECURITY_GROUPID,
           AWS_EC2_IAM_PROFILE,
           PYTHON_SCRIPT_DIR
       } = process.env;
@@ -23,7 +24,8 @@ module.exports = {
     AWS_S3_BUCKET,
     AWS_EC2_AMI,
     AWS_EC2_KEYNAME,
-    AWS_EC2_SECURITY_GROUPID,
+    AWS_EC2_WEB_SECURITY_GROUPID,
+    AWS_EC2_PROCESSOR_SECURITY_GROUPID,
     AWS_EC2_IAM_PROFILE,
     PYTHON_SCRIPT_DIR,
     DEBUG       : DEBUG === "true",

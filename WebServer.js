@@ -72,6 +72,7 @@ app.post( '/', upload.single( 'myfile' ), async ( req, res, next ) => {
 } );
 
 app.listen( config.WEB_PORT, config.WEB_HOSTNAME, function () {
+    log('-----STARTING WEBAPP-----');
     log( `Server running at http://${ config.WEB_HOSTNAME }:${ config.WEB_PORT }/` );
 } );
 

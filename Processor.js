@@ -189,6 +189,7 @@ meta.request( "/latest/meta-data/instance-id", ( err, data ) => {
 
     setTimer();
 
+    log( '-----STARTING PROCESSOR-----' );
     sqsConsumer.start();
 
 } );

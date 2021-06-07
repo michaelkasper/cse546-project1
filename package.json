@@ -4,9 +4,10 @@
   "description": "",
   "main": "WebServer.js",
   "scripts": {
-    "test": "python3 testers/workload_generator.py --num_request 3 --url 'http://ec2-35-170-191-163.compute-1.amazonaws.com:3000' --image_folder \"$INIT_CWD/images/\"",
+    "test": "python3 testers/workload_generator.py --num_request 3 --url 'http://ec2-3-86-203-116.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
+    "test:bulk": "python3 testers/multithread_workload_generator.py --num_request 3 --url 'http://ec2-3-86-203-116.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
     "test:local": "python3 testers/workload_generator.py --num_request 30 --url 'http://localhost:3000' --image_folder \"testers/images/\"",
-    "test:local:bulk": "python3 testers/multithread_workload_generator.py --num_request 30 --url 'http://ec2-35-170-191-163.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
+    "test:local:bulk": "python3 testers/multithread_workload_generator.py --num_request 30 --url 'http://localhost:3000' --image_folder \"testers/images/\"",
     "start-web": "env-cmd --fallback -f ./.env.local node WebServer.js",
     "start-controller": "env-cmd --fallback -f ./.env.local node Controller.js",
     "start-processor": "env-cmd --fallback -f ./.env.local node Processor.js",
