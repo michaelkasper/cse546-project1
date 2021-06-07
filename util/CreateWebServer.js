@@ -22,7 +22,7 @@ const ec2 = new AWS.EC2();
     } ).promise();
 
     const newInstanceId = result.Instances[ 0 ].InstanceId;
-
+    
     await ec2.createTags( {
         Resources: [ newInstanceId ], Tags: [
             {
