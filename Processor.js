@@ -15,11 +15,11 @@ const meta = new AWS.MetadataService();
     const config = await getConfig();
 
     const log = () => {
-        config.debug && console.log.apply( null, arguments );
+        config.debug && console.log( arguments );
     }
 
     const logError = () => {
-        config.debug && console.error.apply( null, arguments );
+        config.debug && console.error( arguments );
     }
 
     meta.request( "/latest/meta-data/instance-id", ( err, data ) => {
