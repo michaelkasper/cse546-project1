@@ -5,29 +5,31 @@ const fs     = require( 'fs' ).promises;
 const ec2 = new AWS.EC2();
 
 
-const bootScript = await fs.readFile( 'scripts/webserver.boot.sh', 'utf8' );
+( async () => {
+    const bootScript = await fs.readFile( 'scripts/webserver.boot.sh', 'utf8' );
 
-const result = await ec2.runInstances( {
-    ImageId           : config.AWS_EC2_AMI,
-    InstanceType      : 't2.micro',
-    IamInstanceProfile: {
-        Arn: "arn:aws:iam::415900791134:instance-profile/CSE546-Webapp"
-    },
-    MinCount          : 1,
-    MaxCount          : 1,
-    UserData          : Buffer.from( bootScript ).toString( 'base64' ),
-    KeyName           : config.AWS_EC2_KEYNAME,
-    SecurityGroupIds  : [ config.AWS_EC2_SECURITY_GROUPID ]
-} ).promise();
+    const result = await ec2.runInstances( {
+        ImageId           : config.AWS_EC2_AMI,
+        InstanceType      : 't2.micro',
+        IamInstanceProfile: {
+            Arn: "arn:aws:iam::415900791134:instance-profile/CSE546-Webapp"
+        },
+        MinCount          : 1,
+        MaxCount          : 1,
+        UserData          : Buffer.from( bootScript ).toString( 'base64' ),
+        KeyName           : config.AWS_EC2_KEYNAME,
+        SecurityGroupIds  : [ config.AWS_EC2_SECURITY_GROUPID ]
+    } ).promise();
 
-const newInstanceId = result.Instances[ 0 ].InstanceId;
+    const newInstanceId = result.Instances[ 0 ].InstanceId;
 
-await ec2.createTags( {
-    Resources: [ newInstanceId ], Tags: [
-        {
-            Key  : 'webserver',
-            Value: ''
-        }
-    ]
-} ).promise();
+    await ec2.createTags( {
+        Resources: [ newInstanceId ], Tags: [
+            {
+                Key  : 'webserver',
+                Value: ''
+            }
+        ]
+    } ).promise();
 
+} )();
