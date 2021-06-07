@@ -2,18 +2,18 @@ const config            = require( './util/config' );
 const { log, logError } = require( './util/log' );
 const AWS               = require( 'aws-sdk' );
 const { Consumer }      = require( 'sqs-consumer' );
-const uuid              = require( 'uuid' );
 const fs                = require( 'fs' ).promises;
 const spawn             = require( 'child-process-promise' ).spawn;
 const { join }          = require( 'path' );
 
-const s3   = new AWS.S3();
-const sqs  = new AWS.SQS();
-const ec2  = new AWS.EC2();
-const meta = new AWS.MetadataService();
+const CurrentInstanceId = require( './util/CurrentInstanceId' );
 
-meta.request( "/latest/meta-data/instance-id", ( err, data ) => {
-    const instanceId = data || uuid.v4();
+const s3  = new AWS.S3();
+const sqs = new AWS.SQS();
+const ec2 = new AWS.EC2();
+
+( async () => {
+    const instanceId = await CurrentInstanceId();
 
     let timer = null;
 
@@ -192,4 +192,4 @@ meta.request( "/latest/meta-data/instance-id", ( err, data ) => {
     log( '-----STARTING PROCESSOR-----' );
     sqsConsumer.start();
 
-} );
+} )();
