@@ -52,7 +52,7 @@ const meta = new AWS.MetadataService();
 
 
                 const ext       = s3key.split( '.' ).pop();
-                const localPath = join( process.cwd(), `image/${ instanceId }.${ ext }` );
+                const localPath = join( process.cwd(), `${ instanceId }.${ ext }` );
 
                 let result = null;
                 let error  = false;
@@ -111,7 +111,7 @@ const meta = new AWS.MetadataService();
                         Bucket: config.s3Bucket,
                         Key   : s3key
                     } ).promise();
-                    
+
                     const t2 = await fs.writeFile( localPath, s3File.Body );
                     console.log( t2 );
 
@@ -164,7 +164,7 @@ const meta = new AWS.MetadataService();
                 // cleanup
                 try {
                     await Promise.all( [
-                        fs.unlink( localPath ),
+                        // fs.unlink( localPath ),
                         s3.deleteObject( {
                             Bucket: config.s3Bucket,
                             Key   : s3key
