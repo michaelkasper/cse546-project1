@@ -52,7 +52,7 @@ const meta = new AWS.MetadataService();
 
 
                 const ext       = s3key.split( '.' ).pop();
-                const localPath = join( process.cwd(), `${ instanceId }.${ ext }` );
+                const localPath = join( process.cwd(), `image/${ instanceId }.${ ext }` );
 
                 let result = null;
                 let error  = false;
