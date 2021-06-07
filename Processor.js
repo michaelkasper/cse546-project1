@@ -113,7 +113,7 @@ console.log( userInfo );
                     }
 
                 } catch ( err ) {
-                    log( 'flag start', err );
+                    log( 'flag-start-error', err );
                     return true;
                 }
 
@@ -127,26 +127,19 @@ console.log( userInfo );
 
                     await fs.writeFile( localPath, s3File.Body );
 
-
-                    const { stdout: stdout1 } = await spawn( 'who', {
-                        cwd    : config.scriptDir,
-                        capture: [ 'stdout', 'stderr' ]
-                    } );
-
-                    console.log( 'stdout1', stdout1 );
-
                     const { stdout } = await spawn( 'python3', [ 'image_classification.py', localPath ], {
                         cwd    : config.scriptDir,
                         capture: [ 'stdout', 'stderr' ]
                     } );
-                    result           = stdout.toString();
+
+                    result = stdout.toString();
 
                 } catch ( err ) {
                     if ( err.stderr ) {
                         //python error
-                        log( 'python', err.stderr );
+                        log( 'python-error', err.stderr );
                     }
-                    log( 'process', err );
+                    log( 'process-error', err );
                     error = true;
                 }
 
@@ -178,20 +171,20 @@ console.log( userInfo );
                         }
                     } ).promise();
                 } catch ( error ) {
-                    log( 'flag complete', error );
+                    log( 'flag-complete-error', error );
                 }
 
                 // cleanup
                 try {
                     await Promise.all( [
-                        // fs.unlink( localPath ),
+                        fs.unlink( localPath ),
                         s3.deleteObject( {
                             Bucket: config.s3Bucket,
                             Key   : s3key
                         } ).promise()
                     ] );
                 } catch ( err ) {
-                    log( 'cleanup', err );
+                    log( 'cleanup-error', err );
                 }
 
 
