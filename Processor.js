@@ -111,11 +111,7 @@ const meta = new AWS.MetadataService();
                         Bucket: config.s3Bucket,
                         Key   : s3key
                     } ).promise();
-
-
-                    const t1 = await fs.chmod( join( process.cwd(), `image` ), '0666' );
-                    console.log( t1 );
-
+                    
                     const t2 = await fs.writeFile( localPath, s3File.Body );
                     console.log( t2 );
 
