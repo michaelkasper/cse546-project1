@@ -14,12 +14,12 @@ const meta = new AWS.MetadataService();
 ( async () => {
     const config = await getConfig();
 
-    const log = ( message ) => {
-        config.debug && console.log( message );
+    const log = () => {
+        config.debug && console.log.apply( null, arguments );
     }
 
-    const logError = ( message ) => {
-        config.debug && console.error( message );
+    const logError = () => {
+        config.debug && console.error.apply( null, arguments );
     }
 
     meta.request( "/latest/meta-data/instance-id", ( err, data ) => {
@@ -128,7 +128,7 @@ const meta = new AWS.MetadataService();
                         capture: [ 'stdout', 'stderr' ]
                     } );
 
-                    console.log( stdout1 );
+                    console.log( 'stdout1', stdout1.toString() );
 
                     const { stdout } = await spawn( 'python3', [ 'image_classification.py', localPath ], {
                         cwd    : config.scriptDir,
