@@ -12,7 +12,10 @@ module.exports = async () => {
             '/cse546/s3Bucket',
             '/cse546/scriptDir',
             '/cse546/sqsInputUrl',
-            '/cse546/sqsOutputUrl'
+            '/cse546/sqsOutputUrl',
+            '/cse546/securityGroupId',
+            '/cse546/keyName',
+            '/cse546/debug'
         ]
     } ).promise();
 
@@ -20,6 +23,8 @@ module.exports = async () => {
         ...acc,
         [ param.Name.split( '/' ).pop() ]: param.Value
     } ), {} );
+
+    awsParams[ 'debug' ] = awsParams[ 'debug' ] === "true"
 
     return {
         debug: false,

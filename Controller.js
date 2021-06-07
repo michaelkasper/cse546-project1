@@ -39,7 +39,9 @@ const ec2 = new AWS.EC2();
                         },
                         MinCount          : 1,
                         MaxCount          : 1,
-                        UserData          : Buffer.from( bootScript ).toString( 'base64' )
+                        UserData          : Buffer.from( bootScript ).toString( 'base64' ),
+                        KeyName           : config.keyName,
+                        SecurityGroupIds  : [ config.securityGroupId ]
                     } ).promise();
 
                     const newInstanceId = result.Instances[ 0 ].InstanceId;
