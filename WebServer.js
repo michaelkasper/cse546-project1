@@ -64,16 +64,16 @@ const sqs = new AWS.SQS();
                 QueueUrl              : config.sqsInputUrl
             } ).promise();
 
-            console.log( `SENT: ${ req.id }` );
+            config.debug && console.log( `SENT: ${ req.id }` );
             pendingResponses[ req.id ] = res;
         } catch ( error ) {
-            console.log( error );
+            config.debug && console.log( error );
             res.send( "We ran into an error. Please try again." );
         }
     } );
 
     app.listen( config.WEB_PORT, config.WEB_HOSTNAME, function () {
-        console.log( `Server running at http://${ config.WEB_HOSTNAME }:${ config.WEB_PORT }/` );
+        config.debug && console.log( `Server running at http://${ config.WEB_HOSTNAME }:${ config.WEB_PORT }/` );
     } );
 
 } )();

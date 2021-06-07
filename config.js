@@ -22,6 +22,7 @@ module.exports = async () => {
     } ), {} );
 
     return {
+        debug: false,
         ...awsParams,
         ...process.env,
         WEB_PORT    : 3000,

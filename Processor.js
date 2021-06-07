@@ -34,7 +34,7 @@ const meta = new AWS.MetadataService();
                     await new Promise( r => setTimeout( r, 2000 ) );
                 }
             }, 300000 );
-            console.log( `Timer set for 5min` );
+            config.debug && console.log( `Timer set for 5min` );
         }
 
         const sqsConsumer = Consumer.create( {
@@ -45,10 +45,10 @@ const meta = new AWS.MetadataService();
 
                 if ( timer ) {
                     clearTimeout( timer );
-                    console.log( `Clearing Timer` );
+                    config.debug && console.log( `Clearing Timer` );
                 }
 
-                console.log( `PROCESSING: ${ requestId }` );
+                config.debug && console.log( `PROCESSING: ${ requestId }` );
 
 
                 const ext       = s3key.split( '.' ).pop();
@@ -67,7 +67,7 @@ const meta = new AWS.MetadataService();
                     const currentFlag = currentTags.find( tag => tag.Key === 'instance' );
                     if ( currentFlag ) {
                         // todo: validate instance is still active
-                        console.log( `SKIPPING: ${ requestId }` );
+                        config.debug && console.log( `SKIPPING: ${ requestId }` );
                         return;
                     }
 
@@ -95,12 +95,12 @@ const meta = new AWS.MetadataService();
 
                     const newFlag = newTags.find( tag => tag.Key === 'processing' );
                     if ( !newFlag || newFlag.Value !== instanceId ) {
-                        console.log( `SKIPPING: ${ requestId }` );
+                        config.debug && console.log( `SKIPPING: ${ requestId }` );
                         return;
                     }
 
                 } catch ( err ) {
-                    console.log( 'flag start', err );
+                    config.debug && console.log( 'flag start', err );
                     return true;
                 }
 
@@ -123,9 +123,9 @@ const meta = new AWS.MetadataService();
                 } catch ( err ) {
                     if ( err.stderr ) {
                         //python error
-                        console.log( 'python', err.stderr );
+                        config.debug && console.log( 'python', err.stderr );
                     }
-                    console.log( 'process', err );
+                    config.debug && console.log( 'process', err );
                     error = true;
                 }
 
@@ -139,7 +139,7 @@ const meta = new AWS.MetadataService();
                         QueueUrl              : config.sqsOutputUrl
                     } ).promise()
                 } catch ( error ) {
-                    console.log( 'message', error );
+                    config.debug && console.log( 'message', error );
                 }
 
 
@@ -157,7 +157,7 @@ const meta = new AWS.MetadataService();
                         }
                     } ).promise();
                 } catch ( error ) {
-                    console.log( 'flag complete', error );
+                    config.debug && console.log( 'flag complete', error );
                 }
 
                 // cleanup
@@ -170,7 +170,7 @@ const meta = new AWS.MetadataService();
                         } ).promise()
                     ] );
                 } catch ( err ) {
-                    console.log( 'cleanup', err );
+                    config.debug && console.log( 'cleanup', err );
                 }
 
 
