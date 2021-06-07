@@ -122,7 +122,15 @@ const meta = new AWS.MetadataService();
 
                     await fs.writeFile( localPath, s3File.Body );
 
-                    const { stdout } = await spawn( 'sudo', [ 'python3', 'image_classification.py', localPath ], {
+
+                    const { stdout: stdout1 } = await spawn( 'whoami', {
+                        cwd    : config.scriptDir,
+                        capture: [ 'stdout', 'stderr' ]
+                    } );
+
+                    console.log( stdout1 );
+
+                    const { stdout } = await spawn( 'python3', [ 'image_classification.py', localPath ], {
                         cwd    : config.scriptDir,
                         capture: [ 'stdout', 'stderr' ]
                     } );
