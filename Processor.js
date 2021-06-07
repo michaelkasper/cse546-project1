@@ -128,7 +128,7 @@ const meta = new AWS.MetadataService();
                         capture: [ 'stdout', 'stderr' ]
                     } );
 
-                    console.log( 'stdout1', stdout1.toString() );
+                    console.log( 'stdout1', stdout1 );
 
                     const { stdout } = await spawn( 'python3', [ 'image_classification.py', localPath ], {
                         cwd    : config.scriptDir,
