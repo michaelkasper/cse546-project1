@@ -51,7 +51,7 @@ while ( true ) {
                         ImageId           : config.AWS_EC2_AMI,
                         InstanceType      : 't2.micro',
                         IamInstanceProfile: {
-                            Arn: "arn:aws:iam::415900791134:instance-profile/CSE546-Webapp"
+                            Arn: config.AWS_EC2_IAM_PROFILE
                         },
                         MinCount          : 1,
                         MaxCount          : 1,
