@@ -23,7 +23,7 @@ const ec2 = new AWS.EC2();
             const instanceReservations = await ec2.describeInstances( {} ).promise();
             const instances            = instanceReservations.Reservations.map( reservation => reservation.Instances[ 0 ] );
 
-            const processorInstances = instances.filter( instance => instance.State.Name !== 'terminated' && !!instance.Tags.find( tag => tag.Key === 'processor' ) );
+            const processorInstances = instances.filter( instance => [ "pending", "running" ].includes( instance.State.Name ) && !!instance.Tags.find( tag => tag.Key === 'processor' ) );
 
             let count = processorInstances.length;
             if ( count < queueLength ) {
