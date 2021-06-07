@@ -12,7 +12,6 @@ const sqs  = new AWS.SQS();
 const ec2  = new AWS.EC2();
 const meta = new AWS.MetadataService();
 
-
 meta.request( "/latest/meta-data/instance-id", ( err, data ) => {
     const instanceId = data || uuid.v4();
 
@@ -113,7 +112,7 @@ meta.request( "/latest/meta-data/instance-id", ( err, data ) => {
 
                 await fs.writeFile( localPath, s3File.Body );
 
-                const { stdout } = await spawn( 'sudo', [ 'python3', 'image_classification.py', localPath ], {
+                const { stdout } = await spawn( 'python3', [ 'image_classification.py', localPath ], {
                     cwd    : config.PYTHON_SCRIPT_DIR,
                     capture: [ 'stdout', 'stderr' ]
                 } );
