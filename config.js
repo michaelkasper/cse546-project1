@@ -23,6 +23,8 @@ module.exports = async () => {
 
     return {
         ...awsParams,
-        ...process.env
+        ...process.env,
+        WEB_PORT    : 3000,
+        WEB_HOSTNAME: "0.0.0.0"
     };
 }
