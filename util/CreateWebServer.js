@@ -28,6 +28,10 @@ const ec2 = new AWS.EC2();
             {
                 Key  : 'webserver',
                 Value: ''
+            },
+            {
+                Key  : 'status',
+                Value: 'pending'
             }
         ]
     } ).promise();
