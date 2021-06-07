@@ -12,10 +12,6 @@ const sqs  = new AWS.SQS();
 const ec2  = new AWS.EC2();
 const meta = new AWS.MetadataService();
 
-const userInfo = os.userInfo();
-
-console.log( userInfo );
-
 ( async () => {
     const config = await getConfig();
 
@@ -127,7 +123,7 @@ console.log( userInfo );
 
                     await fs.writeFile( localPath, s3File.Body );
 
-                    const { stdout } = await spawn( 'python3', [ 'image_classification.py', localPath ], {
+                    const { stdout } = await spawn( 'sudo', [ 'python3', 'image_classification.py', localPath ], {
                         cwd    : config.scriptDir,
                         capture: [ 'stdout', 'stderr' ]
                     } );
