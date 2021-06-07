@@ -1,16 +1,15 @@
-require( 'dotenv' ).config();
-
-const AWS    = require( 'aws-sdk' );
-const fs     = require( 'fs' ).promises;
-const config = require( './config' );
-
-AWS.config.update( { region: config.AWS_REGION } );
+const getConfig = require( './config' );
+const AWS       = require( 'aws-sdk' );
+const fs        = require( 'fs' ).promises;
 
 const s3  = new AWS.S3();
 const sqs = new AWS.SQS();
 const ec2 = new AWS.EC2();
 
 ( async () => {
+
+    const config = await getConfig();
+
     while ( true ) {
         const sqsAttributes = await sqs.getQueueAttributes( {
             QueueUrl      : config.sqsInputUrl,
@@ -28,7 +27,7 @@ const ec2 = new AWS.EC2();
                 //create ec2
                 const bootScript    = await fs.readFile( '/etc/hosts', 'utf8' );
                 const result        = await ec2.runInstances( {
-                    ImageId           : 'AMI_ID',
+                    ImageId           : config.ami,
                     InstanceType      : 't2.micro',
                     IamInstanceProfile: "arn:aws:iam::415900791134:instance-profile/CSE546-Webapp",
                     MinCount          : 1,

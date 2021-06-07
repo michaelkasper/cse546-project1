@@ -6,14 +6,10 @@
   "scripts": {
     "test": "python3 testers/workload_generator.py --num_request 3 --url 'http://ec2-3-88-32-2.compute-1.amazonaws.com:3000' --image_folder \"$INIT_CWD/images/\"",
     "test:local": "python3 testers/multithread_workload_generator.py --num_request 30 --url 'http://localhost:3000' --image_folder \"testers/images/\"",
-    "start-web:local": "env-cmd default,local node WebServer.js",
-    "start-web:prod": "env-cmd default,prod node WebServer.js",
-    "start-controller:local": "env-cmd default,local node Controller.js",
-    "start-controller:prod": "env-cmd default,prod node Controller.js",
-    "start-processor:local": "env-cmd default,local node Processor.js",
-    "start-processor:prod": "env-cmd default,prod node Processor.js",
-    "start:local": "concurrently --kill-others \"npm run start-web:local\" \"npm run start-controller:local\"",
-    "start:prod": "concurrently --kill-others \"npm run start-web:prod\" \"npm run start-controller:prod\""
+    "start-web": "node WebServer.js",
+    "start-controller": "node Controller.js",
+    "start-processor": "node Processor.js",
+    "start": "concurrently --kill-others \"npm run start-web\" \"npm run start-controller\""
   },
   "author": "",
   "license": "ISC",
@@ -23,7 +19,6 @@
     "child-process-promise": "^2.2.1",
     "concurrently": "^6.2.0",
     "dotenv": "^10.0.0",
-    "env-cmd": "^10.1.0",
     "express": "^4.17.1",
     "express-request-id": "^1.4.1",
     "multer": "^1.4.2",
