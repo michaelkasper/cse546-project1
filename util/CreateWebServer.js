@@ -6,7 +6,7 @@ const ec2 = new AWS.EC2();
 
 
 ( async () => {
-    const bootScript = await fs.readFile( 'scripts/webserver.boot.sh', 'utf8' );
+    const bootScript = await fs.readFile( '../scripts/webserver.boot.sh', 'utf8' );
 
     const result = await ec2.runInstances( {
         ImageId           : config.AWS_EC2_AMI,
@@ -22,7 +22,7 @@ const ec2 = new AWS.EC2();
     } ).promise();
 
     const newInstanceId = result.Instances[ 0 ].InstanceId;
-    
+
     await ec2.createTags( {
         Resources: [ newInstanceId ], Tags: [
             {
