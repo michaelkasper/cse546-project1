@@ -71,6 +71,7 @@ const ec2 = new AWS.EC2();
     app.use( addRequestId );
 
     app.post( '/', upload.single( 'myfile' ), async ( req, res, next ) => {
+        req.setTimeout( 0 );
         try {
             await sqs.sendMessage( {
                 MessageBody           : JSON.stringify( {
