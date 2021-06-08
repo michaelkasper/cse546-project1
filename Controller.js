@@ -13,6 +13,7 @@ const ec2 = new AWS.EC2();
     log( '-----STARTING CONTROLLER-----' );
 
     try {
+        console.log( fs );
         const scriptPath = join( process.cwd(), 'scripts', 'processor.boot.sh' );
         const bootScript = await fs.readFile( scriptPath, 'utf8' );
 
