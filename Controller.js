@@ -1,7 +1,6 @@
 const config   = require( './util/config' );
 const { log }  = require( './util/log' );
 const AWS      = require( 'aws-sdk' );
-const ts       = require( 'fs' );
 const fs       = require( 'fs' ).promises;
 const { join } = require( 'path' );
 
@@ -15,7 +14,7 @@ const ec2 = new AWS.EC2();
 
     const scriptPath = join( process.cwd(), 'scripts', 'processor.boot.sh' );
     const bootScript = await fs.readFile( scriptPath, 'utf8' );
-    
+
     while ( true ) {
         const sqsAttributes = await sqs.getQueueAttributes( {
             QueueUrl      : config.SQS_INPUT_URL,
