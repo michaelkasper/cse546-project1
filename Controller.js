@@ -12,13 +12,17 @@ const ec2 = new AWS.EC2();
 
     log( '-----STARTING CONTROLLER-----' );
 
-    const scriptPath = join( process.cwd(), 'scripts', 'processor.boot.sh' );
-    const bootScript = await fs.readFile( scriptPath, 'utf8' );
+    try {
+        const scriptPath = join( process.cwd(), 'scripts', 'processor.boot.sh' );
+        const bootScript = await fs.readFile( scriptPath, 'utf8' );
 
-    console.log( scriptPath );
-    console.log( bootScript );
+        console.log( scriptPath );
+        console.log( bootScript );
+    } catch ( err ) {
+        console.log( err );
+    }
     await new Promise( r => setTimeout( r, 5000000000000000000000 ) );
-
+    return;
     while ( true ) {
         const sqsAttributes = await sqs.getQueueAttributes( {
             QueueUrl      : config.SQS_INPUT_URL,
