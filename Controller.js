@@ -49,7 +49,7 @@ const ec2 = new AWS.EC2();
                 //create ec2
                 while ( count < queueLength && count < 20 ) {
                     try {
-                        const bootScript = await fs.readFile( 'scripts/processor.boot.sh', 'utf8' );
+                        const bootScript = await fs.readFile( './scripts/processor.boot.sh', 'utf8' );
 
                         const result = await ec2.runInstances( {
                             ImageId           : config.AWS_EC2_AMI,
