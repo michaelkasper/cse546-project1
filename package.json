@@ -4,8 +4,8 @@
   "description": "",
   "main": "WebServer.js",
   "scripts": {
-    "test": "python3 testers/workload_generator.py --num_request 3 --url 'http://ec2-54-86-29-175.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
-    "test:bulk": "python3 testers/multithread_workload_generator.py --num_request 3 --url 'http://ec2-34-238-84-190.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
+    "test": "python3 testers/workload_generator.py --num_request 3 --url 'http://ec2-52-207-214-176.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
+    "test:bulk": "python3 testers/multithread_workload_generator.py --num_request 3 --url 'http://ec2-52-207-214-176.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
     "test:local": "python3 testers/workload_generator.py --num_request 30 --url 'http://localhost:3000' --image_folder \"testers/images/\"",
     "test:local:bulk": "python3 testers/multithread_workload_generator.py --num_request 30 --url 'http://localhost:3000' --image_folder \"testers/images/\"",
     "webapp": "env-cmd --fallback -f ./.env.local node WebServer.js",
@@ -23,6 +23,7 @@
     "env-cmd": "^10.1.0",
     "express": "^4.17.1",
     "express-request-id": "^1.4.1",
+    "fs": "^0.0.1-security",
     "multer": "^1.4.2",
     "multer-s3": "^2.9.0",
     "sqs-consumer": "^5.5.0",
