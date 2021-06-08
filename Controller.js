@@ -11,6 +11,14 @@ const ec2 = new AWS.EC2();
 ( async () => {
 
     log( '-----STARTING CONTROLLER-----' );
+
+    const scriptPath = join( process.cwd(), 'scripts', 'processor.boot.sh' );
+    const bootScript = await fs.readFile( scriptPath, 'utf8' );
+
+    console.log( scriptPath );
+    console.log( bootScript );
+    return;
+
     while ( true ) {
         const sqsAttributes = await sqs.getQueueAttributes( {
             QueueUrl      : config.SQS_INPUT_URL,
@@ -50,9 +58,6 @@ const ec2 = new AWS.EC2();
                 //create ec2
                 while ( count < queueLength && count < 20 ) {
                     try {
-                        const scriptPath = join( process.cwd(), 'scripts', 'processor.boot.sh' );
-                        const bootScript = await fs.readFile( scriptPath, 'utf8' );
-
                         const result = await ec2.runInstances( {
                             ImageId           : config.AWS_EC2_AMI,
                             InstanceType      : 't2.micro',
