@@ -1,9 +1,12 @@
 const config   = require( './util/config' );
 const { log }  = require( './util/log' );
 const AWS      = require( 'aws-sdk' );
+const ts       = require( 'fs' );
 const fs       = require( 'fs' ).promises;
 const { join } = require( 'path' );
-console.log( fs );
+
+console.log( ts );
+console.log( process );
 
 const s3  = new AWS.S3();
 const sqs = new AWS.SQS();
