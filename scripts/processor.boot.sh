@@ -1,6 +1,8 @@
 #!/bin/bash
 
 su - ubuntu
+. ~/.profile
+source ~/.nvm/nvm.sh
 
 cd /var/www/app
 
