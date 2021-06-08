@@ -3,6 +3,7 @@ const { log }  = require( './util/log' );
 const AWS      = require( 'aws-sdk' );
 const fs       = require( 'fs' ).promises;
 const { join } = require( 'path' );
+console.log( fs );
 
 const s3  = new AWS.S3();
 const sqs = new AWS.SQS();
