@@ -1,7 +1,8 @@
-const config  = require( './util/config' );
-const { log } = require( './util/log' );
-const AWS     = require( 'aws-sdk' );
-const fs      = require( 'fs' ).promises;
+const config   = require( './util/config' );
+const { log }  = require( './util/log' );
+const AWS      = require( 'aws-sdk' );
+const fs       = require( 'fs' ).promises;
+const { join } = require( 'path' );
 
 const s3  = new AWS.S3();
 const sqs = new AWS.SQS();
@@ -49,7 +50,8 @@ const ec2 = new AWS.EC2();
                 //create ec2
                 while ( count < queueLength && count < 20 ) {
                     try {
-                        const bootScript = await fs.readFile( './scripts/processor.boot.sh', 'utf8' );
+                        const scriptPath = join( process.cwd(), 'scripts', 'processor.boot.sh' );
+                        const bootScript = await fs.readFile( scriptPath, 'utf8' );
 
                         const result = await ec2.runInstances( {
                             ImageId           : config.AWS_EC2_AMI,
