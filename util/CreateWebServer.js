@@ -30,8 +30,8 @@ const ec2 = new AWS.EC2();
                 Value: 'pending'
             },
             {
-                Key  : 'name',
-                Value: 'webserver'
+                Key  : 'Name',
+                Value: 'webapp'
             }
         ]
     } ).promise();
