@@ -5,9 +5,6 @@ const ts       = require( 'fs' );
 const fs       = require( 'fs' ).promises;
 const { join } = require( 'path' );
 
-console.log( ts );
-console.log( process );
-
 const s3  = new AWS.S3();
 const sqs = new AWS.SQS();
 const ec2 = new AWS.EC2();
@@ -16,18 +13,9 @@ const ec2 = new AWS.EC2();
 
     log( '-----STARTING CONTROLLER-----' );
 
-    try {
-        console.log( fs );
-        const scriptPath = join( process.cwd(), 'scripts', 'processor.boot.sh' );
-        const bootScript = await fs.readFile( scriptPath, 'utf8' );
-
-        console.log( scriptPath );
-        console.log( bootScript );
-    } catch ( err ) {
-        console.log( err );
-    }
-    await new Promise( r => setTimeout( r, 5000000000000000000000 ) );
-    return;
+    const scriptPath = join( process.cwd(), 'scripts', 'processor.boot.sh' );
+    const bootScript = await fs.readFile( scriptPath, 'utf8' );
+    
     while ( true ) {
         const sqsAttributes = await sqs.getQueueAttributes( {
             QueueUrl      : config.SQS_INPUT_URL,

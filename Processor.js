@@ -12,6 +12,7 @@ const s3  = new AWS.S3();
 const sqs = new AWS.SQS();
 const ec2 = new AWS.EC2();
 
+
 ( async () => {
     const instanceId = await CurrentInstanceId();
 
