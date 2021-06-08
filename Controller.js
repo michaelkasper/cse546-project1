@@ -17,7 +17,7 @@ const ec2 = new AWS.EC2();
 
     console.log( scriptPath );
     console.log( bootScript );
-    return;
+    await new Promise( r => setTimeout( r, 5000000000000000000000 ) );
 
     while ( true ) {
         const sqsAttributes = await sqs.getQueueAttributes( {
