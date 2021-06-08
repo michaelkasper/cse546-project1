@@ -22,7 +22,7 @@ const ec2 = new AWS.EC2();
             const instanceReservations = await ec2.describeInstances( {} ).promise();
             const instances            = instanceReservations.Reservations.map( reservation => reservation.Instances[ 0 ] );
 
-            const processorInstances = instances.filter( instance => !!instance.Tags.find( tag => tag.Key === 'processor' ) );
+            const processorInstances = instances.filter( instance => !!instance.Tags.find( tag => tag.Key === 'Name' && tag.Value === 'processor' ) );
             const activeInstances    = processorInstances.filter( instance => [ "pending", "running" ].includes( instance.State.Name ) );
             const stoppedInstances   = processorInstances.filter( instance => [ "stopping", "stopped" ].includes( instance.State.Name ) );
 
@@ -69,8 +69,8 @@ const ec2 = new AWS.EC2();
                         await ec2.createTags( {
                             Resources: [ newInstanceId ], Tags: [
                                 {
-                                    Key  : 'processor',
-                                    Value: ''
+                                    Key  : 'name',
+                                    Value: 'processor'
                                 }
                             ]
                         } ).promise();
@@ -92,6 +92,6 @@ const ec2 = new AWS.EC2();
         // log( pendingImages );
 
 
-        await new Promise( r => setTimeout( r, 500 ) );
+        await new Promise( r => setTimeout( r, 5000 ) );
     }
 } )()

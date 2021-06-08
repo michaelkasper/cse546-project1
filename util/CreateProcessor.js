@@ -26,9 +26,9 @@ const ec2 = new AWS.EC2();
     await ec2.createTags( {
         Resources: [ newInstanceId ], Tags: [
             {
-                Key  : 'processor',
-                Value: ''
-            }
+                Key  : 'name',
+                Value: 'processor'
+            },
         ]
     } ).promise();
 

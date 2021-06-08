@@ -26,12 +26,12 @@ const ec2 = new AWS.EC2();
     await ec2.createTags( {
         Resources: [ newInstanceId ], Tags: [
             {
-                Key  : 'webserver',
-                Value: ''
-            },
-            {
                 Key  : 'status',
                 Value: 'pending'
+            },
+            {
+                Key  : 'name',
+                Value: 'webserver'
             }
         ]
     } ).promise();
