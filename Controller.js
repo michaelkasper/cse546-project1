@@ -16,7 +16,6 @@ const ec2 = new AWS.EC2();
             AttributeNames: [ 'ApproximateNumberOfMessages' ]
         } ).promise();
 
-
         const queueLength = sqsAttributes.Attributes.ApproximateNumberOfMessages;
 
         if ( queueLength > 0 ) {
@@ -27,7 +26,7 @@ const ec2 = new AWS.EC2();
             const activeInstances    = processorInstances.filter( instance => [ "pending", "running" ].includes( instance.State.Name ) );
             const stoppedInstances   = processorInstances.filter( instance => [ "stopping", "stopped" ].includes( instance.State.Name ) );
 
-            let count = activeInstances;
+            let count = activeInstances.length;
             if ( count < queueLength ) {
 
                 //boot stopped
@@ -37,12 +36,15 @@ const ec2 = new AWS.EC2();
                     count++;
                 }
 
-                if ( toStart.length > 0 ) {
-                    await ec2.stopInstances( {
-                        InstanceIds: []
-                    } );
+                try {
+                    if ( toStart.length > 0 ) {
+                        const r = await ec2.startInstances( {
+                            InstanceIds: toStart
+                        } ).promise();
+                    }
+                } catch ( err ) {
+                    log( 'start', err )
                 }
-
 
                 //create ec2
                 while ( count < queueLength && count < 20 ) {
