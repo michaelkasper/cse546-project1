@@ -59,7 +59,7 @@ const ec2 = new AWS.EC2();
     const upload = multer( {
         storage: multerS3( {
             s3    : s3,
-            bucket: config.AWS_S3_BUCKET,
+            bucket: config.AWS_S3_INPUT_BUCKET,
             acl   : 'bucket-owner-full-control',
             key   : function ( req, file, cb ) {
                 const ext = file.originalname.split( '.' ).pop();

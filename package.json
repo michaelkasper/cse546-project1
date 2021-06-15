@@ -10,7 +10,7 @@
     "test:local:bulk": "python3 testers/multithread_workload_generator.py --num_request 30 --url 'http://localhost:3000' --image_folder \"testers/images/\"",
     "webapp": "env-cmd --fallback -f ./.env.local node WebServer.js",
     "controller": "env-cmd --fallback -f ./.env.local node Controller.js",
-    "processor": "env-cmd --fallback -f ./.env.local node Processor.js",
+    "processor": "env-cmd --fallback -f ./.env.local node archive/Processor.js",
     "create-web": "env-cmd --fallback -f ./.env.local node util/CreateWebServer.js",
     "create-processor": "env-cmd --fallback -f ./.env.local node util/CreateProcessor.js",
     "start": "concurrently --kill-others \"npm run start-web\" \"npm run start-controller\""

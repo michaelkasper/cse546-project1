@@ -1,12 +1,12 @@
-const config            = require( './util/config' );
-const { log, logError } = require( './util/log' );
+const config            = require( '../util/config' );
+const { log, logError } = require( '../util/log' );
 const AWS               = require( 'aws-sdk' );
 const { Consumer }      = require( 'sqs-consumer' );
 const fs                = require( 'fs' ).promises;
 const spawn             = require( 'child-process-promise' ).spawn;
 const { join }          = require( 'path' );
 
-const CurrentInstanceId = require( './util/CurrentInstanceId' );
+const CurrentInstanceId = require( '../util/CurrentInstanceId' );
 
 const s3  = new AWS.S3();
 const sqs = new AWS.SQS();
