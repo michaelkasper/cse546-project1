@@ -62,8 +62,7 @@ const ec2 = new AWS.EC2();
             bucket: config.AWS_S3_INPUT_BUCKET,
             acl   : 'bucket-owner-full-control',
             key   : function ( req, file, cb ) {
-                const ext = file.originalname.split( '.' ).pop();
-                cb( null, `pending/${ req.id }.${ ext }` );
+                cb( null, file.originalname );
             }
         } )
     } );
