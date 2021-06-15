@@ -91,3 +91,10 @@ if __name__ == "__main__":
         #send output class to S3 output bucket
         result = (image_name,predicted_class)
         object = output_bucket.put_object(Body=result,Key=image_name)
+
+        #deleting the message from input queue
+        receipt_handle = response['Messages'][0]['ReceiptHandle']
+        response = client.delete_message(
+            QueueUrl=input_queue_url,
+            ReceiptHandle=receipt_handle
+        )
