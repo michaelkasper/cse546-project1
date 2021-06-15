@@ -22,9 +22,5 @@ su - ubuntu
 
 cd /var/www/app
 
-git reset --hard HEAD
-git pull
-npm i
-
-npm run processor
+python image_classification_app.py
 --//
