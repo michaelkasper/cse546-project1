@@ -4,15 +4,16 @@
   "description": "",
   "main": "WebServer.js",
   "scripts": {
-    "test": "python3 testers/workload_generator.py --num_request 3 --url 'http://ec2-52-207-214-176.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
-    "test:bulk": "python3 testers/multithread_workload_generator.py --num_request 3 --url 'http://ec2-52-207-214-176.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
+    "test": "python3 testers/workload_generator.py --num_request 3 --url 'http://ec2-3-82-108-114.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
+    "test:bulk": "python3 testers/multithread_workload_generator.py --num_request 3 --url 'http://ec2-3-82-108-114.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
     "test:local": "python3 testers/workload_generator.py --num_request 30 --url 'http://localhost:3000' --image_folder \"testers/images/\"",
     "test:local:bulk": "python3 testers/multithread_workload_generator.py --num_request 30 --url 'http://localhost:3000' --image_folder \"testers/images/\"",
     "webapp": "env-cmd --fallback -f ./.env.local node WebServer.js",
     "controller": "env-cmd --fallback -f ./.env.local node Controller.js",
     "processor": "env-cmd --fallback -f ./.env.local node Processor.js",
     "create-web": "env-cmd --fallback -f ./.env.local node util/CreateWebServer.js",
-    "create-processor": "env-cmd --fallback -f ./.env.local node util/CreateProcessor.js"
+    "create-processor": "env-cmd --fallback -f ./.env.local node util/CreateProcessor.js",
+    "start": "concurrently --kill-others \"npm run start-web\" \"npm run start-controller\""
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +21,7 @@
     "aws-sdk": "^2.922.0",
     "child-process-promise": "^2.2.1",
     "concurrently": "^6.2.0",
+    "daemon": "^1.1.0",
     "env-cmd": "^10.1.0",
     "express": "^4.17.1",
     "express-request-id": "^1.4.1",
