@@ -9,7 +9,7 @@ const ec2 = new AWS.EC2();
     const bootScript = await fs.readFile( 'scripts/processor.boot.sh', 'utf8' );
 
     const result = await ec2.runInstances( {
-        ImageId           : config.AWS_EC2_AMI,
+        ImageId           : config.AWS_EC2_APPTIER_AMI,
         InstanceType      : 't2.micro',
         IamInstanceProfile: {
             Arn: config.AWS_EC2_IAM_PROFILE

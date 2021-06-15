@@ -4,7 +4,6 @@ const AWS      = require( 'aws-sdk' );
 const fs       = require( 'fs' ).promises;
 const { join } = require( 'path' );
 
-const s3  = new AWS.S3();
 const sqs = new AWS.SQS();
 const ec2 = new AWS.EC2();
 
@@ -55,7 +54,7 @@ const ec2 = new AWS.EC2();
                 while ( count < queueLength && count < 20 ) {
                     try {
                         const result = await ec2.runInstances( {
-                            ImageId           : config.AWS_EC2_AMI,
+                            ImageId           : config.AWS_EC2_APPTIER_AMI,
                             InstanceType      : 't2.micro',
                             IamInstanceProfile: {
                                 Arn: config.AWS_EC2_IAM_PROFILE
@@ -85,14 +84,6 @@ const ec2 = new AWS.EC2();
                 }
             }
         }
-
-
-        // const pendingImages = await s3.listObjectsV2( {
-        //     Bucket: config.s3Bucket,
-        //     Prefix: "pending/"
-        // } ).promise();
-        //
-        // log( pendingImages );
 
 
         await new Promise( r => setTimeout( r, 5000 ) );
