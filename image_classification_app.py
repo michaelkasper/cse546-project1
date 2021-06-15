@@ -4,6 +4,7 @@ import time
 import subprocess
 from PIL import Image
 from ec2_metadata import ec2_metadata
+import os
 
 local_Path = "./Processed_images/natural_image.jpeg"
 s3 = boto3.resource('s3')
@@ -20,11 +21,14 @@ input_bucket_name = "cse546-project1"
 # for bucket in s3.buckets.all():
 #     print(bucket.name)
 output_bucket_name = "cse546-project1-outputs"
-input_path = "/input/"
-output_path = "/output/"
+
+# input_path = "/"
+# output_path = "/"
+
 wait_flag = False
 
 input_bucket = s3.Bucket(input_bucket_name)
+output_bucket = s3.Bucket(output_bucket_name)
 
 def get_response():
     response = input_queue.receive_messages(
@@ -48,14 +52,14 @@ if __name__ == "__main__":
             continue
         elif (response == [] and wait_flag ==True):
             # subprocess.call(["halt"])
-            response = instance.stop(
-                    Force=True
-                )
+            # response = instance.stop(
+            #         Force=True
+            #     )
 
         wait_flag = False
         image_key = response.body["s3key"]
         request_id = response.body['request_id']
-        image_name = image_key.split('.')[0]
+        image_name = os.path.basename(image_key).split('.')[0]
         # image_object = input_bucket.Object(image_key)
         # res = image_object.get()
         # file_stream = res["Body"]
@@ -66,4 +70,7 @@ if __name__ == "__main__":
         #send output class to response queue
 
 
+
         #send output class to S3 output bucket
+        result = (image_name,predicted_class)
+        object = output_bucket.put_object(Body=result,Key=image_name)
