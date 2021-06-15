@@ -52,9 +52,9 @@ if __name__ == "__main__":
             continue
         elif (response == [] and wait_flag ==True):
             # subprocess.call(["halt"])
-            response = instance.stop(
-                    Force=True
-                )
+            # response = instance.stop(
+            #         Force=True
+            #     )
 
         wait_flag = False
         image_key = response.body["s3key"]
