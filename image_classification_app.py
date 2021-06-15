@@ -11,15 +11,18 @@ s3 = boto3.resource('s3')
 sqs = boto3.resource('sqs')
 ec2 = boto3.resource('ec2')
 
+sqs_client = boto3.client('sqs')
+
 current_instance_id = ec2_metadata.instance_id
 current_instance = ec2.Instance(current_instance_id)
 
 input_queue = sqs.get_queue_by_name(QueueName='cse546-project1-input.fifo')
-output_queue = sqs.get_queue_by_name(QueueName='cse546-project1-input.fifo')
+output_queue = sqs.get_queue_by_name(QueueName='cse546-project1-output.fifo')
+
+input_queue_url= "https://sqs.us-east-1.amazonaws.com/415900791134/cse546-project1-input.fifo"
+output_queue_url = "https://sqs.us-east-1.amazonaws.com/415900791134/cse546-project1-output.fifo"
 
 input_bucket_name = "cse546-project1"
-# for bucket in s3.buckets.all():
-#     print(bucket.name)
 output_bucket_name = "cse546-project1-outputs"
 
 # input_path = "/"
@@ -30,13 +33,19 @@ wait_flag = False
 input_bucket = s3.Bucket(input_bucket_name)
 output_bucket = s3.Bucket(output_bucket_name)
 
-def get_response():
-    response = input_queue.receive_messages(
-        AttributeNames=['All'],
 
+def get_response():
+    response = sqs.receive_message(
+        QueueUrl=input_queue_url,
+        AttributeNames=[
+            'SentTimestamp'
+        ],
         MaxNumberOfMessages=1,
-        VisibilityTimeout=900,
-        WaitTimeSeconds=1,
+        MessageAttributeNames=[
+            'All'
+        ],
+        VisibilityTimeout=90,
+        WaitTimeSeconds=0
     )
     return response
 
@@ -57,9 +66,10 @@ if __name__ == "__main__":
             #     )
 
         wait_flag = False
-        image_key = response.body["s3key"]
-        request_id = response.body['request_id']
-        image_name = os.path.basename(image_key).split('.')[0]
+        image_key = response['Messages'][0]['Body']['s3key']
+        request_id = response['Messages'][0]['Body']['requestId']
+
+        image_name = image_key.split('.')[0]
         # image_object = input_bucket.Object(image_key)
         # res = image_object.get()
         # file_stream = res["Body"]
@@ -68,6 +78,13 @@ if __name__ == "__main__":
         predicted_class = subprocess.check_output(['python','image_classification.py',local_Path]).strip().decode("ascii")
 
         #send output class to response queue
+        response = client.send_message(
+            QueueUrl=output_queue_url,
+            MessageBody={
+            'pred_class': predicted_class,
+            'request_id': request_id
+            }
+        )
 
 
 
