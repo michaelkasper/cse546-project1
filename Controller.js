@@ -35,7 +35,7 @@ const ec2 = new AWS.EC2();
 
                 //boot stopped
                 const toStart = [];
-                while ( count < queueLength && count < 20 && stoppedInstances.length > 0 ) {
+                while ( count < queueLength && count <= 20 && stoppedInstances.length > 0 ) {
                     toStart.push( stoppedInstances.pop().InstanceId );
                     count++;
                 }
@@ -51,7 +51,7 @@ const ec2 = new AWS.EC2();
                 }
 
                 //create ec2
-                while ( count < queueLength && count < 20 ) {
+                while ( count < queueLength && count <= 20 ) {
                     try {
                         const result = await ec2.runInstances( {
                             ImageId           : config.AWS_EC2_AMI,

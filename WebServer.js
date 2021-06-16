@@ -32,29 +32,7 @@ const ec2 = new AWS.EC2();
 
     }
 
-    const pendingResponses = {};
-    const sqsConsumer      = Consumer.create( {
-        sqs          : sqs,
-        queueUrl     : config.SQS_OUTPUT_URL,
-        handleMessage: async ( message ) => {
-            const { pred_class, request_id, error } = JSON.parse( message.Body );
-            if ( request_id in pendingResponses ) {
-                const res = pendingResponses[ request_id ];
-                res.send( error ? "unknown error occurred" : pred_class );
-                delete pendingResponses[ request_id ];
-            }
-        },
-    } );
-
-    sqsConsumer.on( 'error', ( err ) => {
-        logError( err.message );
-    } );
-
-    sqsConsumer.on( 'processing_error', ( err ) => {
-        logError( err.message );
-    } );
-
-    sqsConsumer.start();
+    // const pendingResponses = {};
 
 
     const upload = multer( {
@@ -84,7 +62,30 @@ const ec2 = new AWS.EC2();
             } ).promise();
 
             log( `SENT: ${ req.id }` );
-            pendingResponses[ req.id ] = res;
+
+            const sqsConsumer = Consumer.create( {
+                sqs          : sqs,
+                queueUrl     : config.SQS_OUTPUT_URL,
+                handleMessage: async ( message ) => {
+                    const { pred_class, request_id, error } = JSON.parse( message.Body );
+                    if ( request_id === req.id ) {
+                        res.send( error ? "unknown error occurred" : pred_class );
+                        sqsConsumer.stop();
+                        return true;
+                    }
+                    return false;
+                },
+            } );
+
+            sqsConsumer.on( 'error', ( err ) => {
+                logError( err.message );
+            } );
+
+            sqsConsumer.on( 'processing_error', ( err ) => {
+                logError( err.message );
+            } );
+
+            sqsConsumer.start();
         } catch ( error ) {
             log( error );
             res.send( "We ran into an error. Please try again." );
