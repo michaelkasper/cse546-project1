@@ -14,6 +14,7 @@ const ec2 = new AWS.EC2();
     const scriptPath   = join( process.cwd(), 'src', 'scripts', 'processor.boot.sh' );
     const bootScript   = await fs.readFile( scriptPath, 'utf8' );
     const stopLog      = {};
+    let pendingLog     = {};
     let toStart        = [];
     let toTerminate    = [];
     let delaySeconds   = 2;
@@ -96,26 +97,39 @@ const ec2 = new AWS.EC2();
             noMessageCount++;
         }
 
+        toTerminate            = [];
+        const pendingInstances = activeInstances.filter( instance => [ "pending" ].includes( instance.State.Name ) );
+        const oldPendingLog    = pendingLog.slice();
+        pendingLog             = {};
+        pendingInstances.forEach( instance => {
+            pendingLog[ instance.InstanceId ] = !oldPendingLog[ instance.InstanceId ] ? Date.now() : oldPendingLog[ instance.InstanceId ];
 
-        toTerminate = [];
+            const MINUTE = 1000;
+            if ( pendingLog[ instance.InstanceId ] < Date.now() - ( MINUTE ) ) {
+                toTerminate.push( instance.InstanceId );
+            }
+        } );
+
+
+        // terminate instances that have been stopped for more then 2 hours
         stoppedInstances.filter( instance => !toStart.includes( instance.InstanceId ) ).forEach( instance => {
             if ( !stopLog[ instance.InstanceId ] ) {
                 stopLog[ instance.InstanceId ] = Date.now();
             }
 
-            //if ideal for 2 hours or more, terminate
+            //if stopped for 2 hours or more, terminate
             const HOUR = 1000 * 60 * 60;
             if ( stopLog[ instance.InstanceId ] < Date.now() - ( 2 * HOUR ) ) {
                 toTerminate.push( instance.InstanceId );
                 delete stopLog[ instance.InstanceId ];
             }
+        } );
 
-            if ( toTerminate.length > 0 ) {
-                ec2.terminateInstances( {
-                    InstanceIds: toTerminate
-                } ).promise();
-            }
-        } )
+        if ( toTerminate.length > 0 ) {
+            await ec2.terminateInstances( {
+                InstanceIds: toTerminate
+            } ).promise();
+        }
 
 
         //every ten minutes we double the delay time
