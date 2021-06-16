@@ -1,4 +1,4 @@
-require( 'config' );
+require( './config' );
 const uuid = require( 'uuid' );
 const AWS  = require( 'aws-sdk' );
 

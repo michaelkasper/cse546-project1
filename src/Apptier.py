@@ -1,14 +1,13 @@
+import boto3
 import json
 import ntpath
 import os
 import pprint
 import subprocess
 import time
-from threading import Timer
-
-import boto3
 from dotenv import dotenv_values
 from ec2_metadata import ec2_metadata
+from threading import Timer
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -65,7 +64,7 @@ if __name__ == "__main__":
             image_key = message['s3key']
             request_id = message['requestId']
             local_name = ntpath.basename(image_key)
-            image_name = ntpath.basename(image_key).split('.')[0]  # TODO: Potention issue if file name has a dot in it
+            image_name = ntpath.basename(image_key).split('.')[0]  # TODO: Potential issue if file name has a dot in it
 
             with open(local_name, 'wb') as f:
                 s3.download_fileobj(config['AWS_S3_INPUT_BUCKET'], image_key, f)
