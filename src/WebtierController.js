@@ -1,5 +1,5 @@
-const config   = require( 'util/config' );
-const { log }  = require( 'util/log' );
+const config   = require( './util/config' );
+const { log }  = require( './util/log' );
 const AWS      = require( 'aws-sdk' );
 const fs       = require( 'fs' ).promises;
 const { join } = require( 'path' );

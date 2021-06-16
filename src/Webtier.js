@@ -1,12 +1,12 @@
-const config            = require( 'util/config' );
-const { log, logError } = require( 'util/log' );
+const config            = require( './util/config' );
+const { log, logError } = require( './util/log' );
 const express           = require( 'express' );
 const addRequestId      = require( 'express-request-id' )();
 const AWS               = require( 'aws-sdk' );
 const multer            = require( 'multer' );
 const multerS3          = require( 'multer-s3' );
 const { Consumer }      = require( 'sqs-consumer' );
-const CurrentInstanceId = require( 'util/CurrentInstanceId' );
+const CurrentInstanceId = require( './util/CurrentInstanceId' );
 
 const app = express();
 const s3  = new AWS.S3();
