@@ -17,6 +17,7 @@ const ec2 = new AWS.EC2();
 ( async () => {
 
     const instanceId = await CurrentInstanceId();
+    console.log( "hello" );
 
     try {
         await ec2.createTags( {
@@ -36,11 +37,11 @@ const ec2 = new AWS.EC2();
         sqs          : sqs,
         queueUrl     : config.SQS_OUTPUT_URL,
         handleMessage: async ( message ) => {
-            const { result, requestId, error } = JSON.parse( message.Body );
-            if ( requestId in pendingResponses ) {
-                const res = pendingResponses[ requestId ];
-                res.send( error ? "unknown error occurred" : result );
-                delete pendingResponses[ requestId ];
+            const { pred_class, request_id, error } = JSON.parse( message.Body );
+            if ( request_id in pendingResponses ) {
+                const res = pendingResponses[ request_id ];
+                res.send( error ? "unknown error occurred" : pred_class );
+                delete pendingResponses[ request_id ];
             }
         },
     } );
