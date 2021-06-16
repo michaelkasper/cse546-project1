@@ -32,7 +32,6 @@ const ec2 = new AWS.EC2();
                     res.send( error ? "unknown error occurred" : pred_class );
                     delete pending[ request_id ];
                     sqsConsumer.stop();
-                    s
                     return true;
                 }
                 return false;
