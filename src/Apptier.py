@@ -17,8 +17,8 @@ ec2 = boto3.client('ec2', region_name='us-east-1')
 s3 = boto3.client('s3', region_name='us-east-1')
 
 config = {
-    **dotenv_values(".env"),
-    **dotenv_values(".env.local"),
+    **dotenv_values("./.env"),
+    **dotenv_values("./.env.local"),
 }
 
 try:

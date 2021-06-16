@@ -25,5 +25,6 @@ cd /var/www/app
 git reset --hard HEAD
 git pull
 
-sudo PYTHONUSERBASE=/home/ubuntu/.local python3 image_classification_app.py
+sudo PYTHONUSERBASE=/home/ubuntu/.local
+npm run apptier
 --//

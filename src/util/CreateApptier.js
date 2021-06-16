@@ -1,4 +1,4 @@
-const config = require( './config' );
+const config = require( 'config' );
 const AWS    = require( 'aws-sdk' );
 const fs     = require( 'fs' ).promises;
 
@@ -6,7 +6,8 @@ const ec2 = new AWS.EC2();
 
 
 ( async () => {
-    const bootScript = await fs.readFile( 'scripts/processor.boot.sh', 'utf8' );
+    const scriptPath = join( process.cwd(), 'src', 'scripts', 'processor.boot.sh' );
+    const bootScript = await fs.readFile( scriptPath, 'utf8' );
 
     const result = await ec2.runInstances( {
         ImageId           : config.AWS_EC2_AMI,
