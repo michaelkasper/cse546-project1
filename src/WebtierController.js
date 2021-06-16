@@ -99,7 +99,7 @@ const ec2 = new AWS.EC2();
 
         toTerminate            = [];
         const pendingInstances = activeInstances.filter( instance => [ "pending" ].includes( instance.State.Name ) );
-        const oldPendingLog    = pendingLog.slice();
+        const oldPendingLog    = { ...pendingLog };
         pendingLog             = {};
         pendingInstances.forEach( instance => {
             pendingLog[ instance.InstanceId ] = !oldPendingLog[ instance.InstanceId ] ? Date.now() : oldPendingLog[ instance.InstanceId ];
