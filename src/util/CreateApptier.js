@@ -1,6 +1,7 @@
-const config = require( './config' );
-const AWS    = require( 'aws-sdk' );
-const fs     = require( 'fs' ).promises;
+const config   = require( './config' );
+const AWS      = require( 'aws-sdk' );
+const fs       = require( 'fs' ).promises;
+const { join } = require( 'path' );
 
 const ec2 = new AWS.EC2();
 

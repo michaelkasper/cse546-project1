@@ -1,4 +1,7 @@
-const config = require( './config' );
+const config   = require( './config' );
+const { join } = require( 'path' );
+
+console.log( join( process.cwd(), 'src', 'scripts', 'webserver.boot.sh' ) );
 
 module.exports = {
     log     : ( ...args ) => {
