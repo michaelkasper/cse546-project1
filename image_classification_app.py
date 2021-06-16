@@ -12,9 +12,9 @@ from ec2_metadata import ec2_metadata
 
 pp = pprint.PrettyPrinter(indent=4)
 
-sqs = boto3.client('sqs')
-ec2 = boto3.client('ec2')
-s3 = boto3.client('s3')
+sqs = boto3.client('sqs', region_name='us-east-1')
+ec2 = boto3.client('ec2', region_name='us-east-1')
+s3 = boto3.client('s3', region_name='us-east-1')
 
 config = {
     **dotenv_values(".env"),

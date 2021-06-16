@@ -54,7 +54,7 @@ const ec2 = new AWS.EC2();
                 while ( count < queueLength && count < 20 ) {
                     try {
                         const result = await ec2.runInstances( {
-                            ImageId           : config.AWS_EC2_APPTIER_AMI,
+                            ImageId           : config.AWS_EC2_AMI,
                             InstanceType      : 't2.micro',
                             IamInstanceProfile: {
                                 Arn: config.AWS_EC2_IAM_PROFILE
