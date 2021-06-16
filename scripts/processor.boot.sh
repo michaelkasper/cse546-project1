@@ -25,5 +25,5 @@ cd /var/www/app
 git reset --hard HEAD
 git pull
 
-python3 image_classification_app.py
+/usr/bin/python3 image_classification_app.py
 --//

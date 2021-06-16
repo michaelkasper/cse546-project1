@@ -27,7 +27,7 @@ const ec2 = new AWS.EC2();
         Resources: [ newInstanceId ], Tags: [
             {
                 Key  : 'Name',
-                Value: 'processor'
+                Value: 'apptier'
             },
         ]
     } ).promise();
