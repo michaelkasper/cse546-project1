@@ -22,5 +22,8 @@ su - ubuntu
 
 cd /var/www/app
 
-python image_classification_app.py
+git reset --hard HEAD
+git pull
+
+python3 image_classification_app.py
 --//
