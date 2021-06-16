@@ -26,7 +26,7 @@ const ec2 = new AWS.EC2();
             const instanceReservations = await ec2.describeInstances( {} ).promise();
             const instances            = instanceReservations.Reservations.map( reservation => reservation.Instances[ 0 ] );
 
-            const processorInstances = instances.filter( instance => !!instance.Tags.find( tag => tag.Key === 'Name' && tag.Value === 'processor' ) );
+            const processorInstances = instances.filter( instance => !!instance.Tags.find( tag => tag.Key === 'Name' && tag.Value === 'apptier' ) );
             const activeInstances    = processorInstances.filter( instance => [ "pending", "running" ].includes( instance.State.Name ) );
             const stoppedInstances   = processorInstances.filter( instance => [ "stopping", "stopped" ].includes( instance.State.Name ) );
 
@@ -72,7 +72,7 @@ const ec2 = new AWS.EC2();
                             Resources: [ newInstanceId ], Tags: [
                                 {
                                     Key  : 'Name',
-                                    Value: 'processor'
+                                    Value: 'apptier'
                                 }
                             ]
                         } ).promise();

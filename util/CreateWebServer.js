@@ -31,7 +31,7 @@ const ec2 = new AWS.EC2();
             },
             {
                 Key  : 'Name',
-                Value: 'webapp'
+                Value: 'webtier'
             }
         ]
     } ).promise();
