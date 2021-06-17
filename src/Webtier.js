@@ -1,12 +1,12 @@
-const config            = require( './util/config' );
-const { log, logError } = require( './util/log' );
-const express           = require( 'express' );
-const addRequestId      = require( 'express-request-id' )();
-const AWS               = require( 'aws-sdk' );
-const multer            = require( 'multer' );
-const multerS3          = require( 'multer-s3' );
-const { Consumer }      = require( 'sqs-consumer' );
-const CurrentInstanceId = require( './util/CurrentInstanceId' );
+const config               = require( './util/config' );
+const { log, logError }    = require( './util/log' );
+const express              = require( 'express' );
+const addRequestId         = require( 'express-request-id' )();
+const AWS                  = require( 'aws-sdk' );
+const multer               = require( 'multer' );
+const multerS3             = require( 'multer-s3' );
+const { Consumer }         = require( 'sqs-consumer' );
+const getCurrentInstanceId = require( './util/getCurrentInstanceId' );
 
 const app = express();
 const s3  = new AWS.S3();
@@ -16,7 +16,7 @@ const ec2 = new AWS.EC2();
 
 ( async () => {
 
-    const instanceId = await CurrentInstanceId();
+    const instanceId = await getCurrentInstanceId();
 
     let count     = 0;
     const pending = {};

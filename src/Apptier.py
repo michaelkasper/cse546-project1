@@ -56,8 +56,8 @@ if __name__ == "__main__":
             Resources=[current_instance_id],
             Tags=[
                 {
-                    'Key': 'Name',
-                    'Value': 'apptier'
+                    'Key': 'Type',
+                    'Value': config['EC2_INSTANT_TYPE_APP']
                 },
                 {
                     'Key': 'Status',

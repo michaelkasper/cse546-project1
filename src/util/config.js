@@ -15,7 +15,9 @@ const {
           AWS_EC2_WEB_SECURITY_GROUPID,
           AWS_EC2_PROCESSOR_SECURITY_GROUPID,
           AWS_EC2_IAM_PROFILE,
-          PYTHON_SCRIPT_DIR
+          PYTHON_SCRIPT_DIR,
+          EC2_INSTANT_TYPE_APP,
+          EC2_INSTANT_TYPE_WEB
       } = process.env;
 
 AWS.config.update( { region: AWS_REGION || 'us-east-1' } );
@@ -32,6 +34,8 @@ module.exports = {
     AWS_EC2_PROCESSOR_SECURITY_GROUPID,
     AWS_EC2_IAM_PROFILE,
     PYTHON_SCRIPT_DIR,
+    EC2_INSTANT_TYPE_APP,
+    EC2_INSTANT_TYPE_WEB,
     DEBUG       : DEBUG === "true",
     AWS_REGION  : AWS_REGION || 'us-east-1',
     WEB_PORT    : WEB_PORT || 3000,

@@ -4,8 +4,8 @@
   "description": "",
   "main": "app/Webtier.js",
   "scripts": {
-    "test": "python3 testers/workload_generator.py --num_request 100 --url 'http://ec2-3-235-196-78.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
-    "test:bulk": "python3 testers/multithread_workload_generator.py --num_request 100 --url 'http://ec2-3-235-196-78.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
+    "test": "python3 testers/workload_generator.py --num_request 3 --url 'http://ec2-34-227-89-193.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
+    "test:bulk": "python3 testers/multithread_workload_generator.py --num_request 100 --url 'http://ec2-34-227-89-193.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\"",
     "test:local": "python3 testers/workload_generator.py --num_request 1 --url 'http://localhost:3000' --image_folder \"testers/images/\"",
     "test:local:bulk": "python3 testers/multithread_workload_generator.py --num_request 100 --url 'http://localhost:3000' --image_folder \"testers/images/\"",
     "webtier": "env-cmd --fallback -f ./.env.local node src/Webtier.js",

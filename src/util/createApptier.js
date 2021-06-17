@@ -4,7 +4,7 @@ const config = require( './config' );
 const AWS    = require( 'aws-sdk' );
 const ec2    = new AWS.EC2();
 
-const createApptier = async () => {
+const createApptier = async ( index ) => {
 
     const bootScript = await getBootScript( 'apptier' );
 
@@ -20,30 +20,41 @@ const createApptier = async () => {
         KeyName           : config.AWS_EC2_KEYNAME,
         SecurityGroupIds  : [ config.AWS_EC2_PROCESSOR_SECURITY_GROUPID ]
     } ).promise();
-    
+
     const newInstanceId = result.Instances[ 0 ].InstanceId;
 
-    await new Promise( r => setTimeout( r, 1000 ) );
+    let needsTag = true;
+    while ( needsTag ) {
+        try {
+            await new Promise( r => setTimeout( r, 1000 ) );
 
-    await ec2.createTags( {
-        Resources: [ newInstanceId ], Tags: [
-            {
-                Key  : 'Status',
-                Value: 'pending'
-            },
-            {
-                Key  : 'Name',
-                Value: 'apptier'
-            }
-        ]
-    } ).promise();
+            await ec2.createTags( {
+                Resources: [ newInstanceId ], Tags: [
+                    {
+                        Key  : 'Status',
+                        Value: 'pending'
+                    },
+                    {
+                        Key  : 'Name',
+                        Value: `${ config.EC2_INSTANT_TYPE_APP }${ index }`
+                    },
+                    {
+                        Key  : 'Type',
+                        Value: config.EC2_INSTANT_TYPE_APP
+                    },
+                ]
+            } ).promise();
+            needsTag = false;
+        } catch ( err ) {
 
+        }
+    }
 };
 
 module.exports.createApptier = createApptier;
 
 switch ( process.argv[ 2 ] ) {
     case 'initiate':
-        createApptier();
+        createApptier( 0 );
         break;
 }

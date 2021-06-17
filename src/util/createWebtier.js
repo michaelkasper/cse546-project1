@@ -33,16 +33,49 @@ const createWebtier = async () => {
             },
             {
                 Key  : 'Name',
-                Value: 'webtier'
-            }
+                Value: `${ config.EC2_INSTANT_TYPE_WEB }1`
+            },
+            {
+                Key  : 'Type',
+                Value: config.EC2_INSTANT_TYPE_WEB
+            },
         ]
     } ).promise();
+
+    return newInstanceId;
 };
 
 module.exports.createWebtier = createWebtier;
 
-switch ( process.argv[ 2 ] ) {
-    case 'initiate':
-        createWebtier();
-        break;
-}
+
+( async () => {
+    switch ( process.argv[ 2 ] ) {
+        case 'initiate':
+            const newInstanceId = await createWebtier();
+
+            const details      = { InstanceId: newInstanceId, PublicDnsName: 'unknown' };
+            let foundPublicDNS = false;
+            let tries          = 0;
+            while ( !foundPublicDNS && tries < 10 ) {
+                await new Promise( r => setTimeout( r, 50000 ) );
+
+                const instanceDetails = await ec2.describeInstances( {
+                    InstanceIds: [ newInstanceId ]
+                } ).promise();
+
+                const instance = instanceDetails.Reservations[ 0 ].Instances[ 0 ];
+
+                if ( instance.PublicDnsName !== '' ) {
+                    foundPublicDNS        = true;
+                    details.PublicDnsName = instance.PublicDnsName;
+                }
+                tries++;
+            }
+
+            console.log( '-----WEBTIER CREATED-----' );
+            console.log( details );
+
+            break;
+    }
+
+} )()

@@ -13,25 +13,6 @@ const ec2 = new AWS.EC2();
     log( '-----STARTING CONTROLLER-----' );
 
     let delaySeconds = 2;
-    // let timer        = null;
-    //
-    // const setTimer = () => {
-    //     if ( timer ) {
-    //         clearInterval( timer );
-    //     }
-    //
-    //     delaySeconds = 2;
-    //     timer        = setInterval( () => {
-    //         if ( delaySeconds < 256 ) {// max delay 4.2 min
-    //             delaySeconds = delaySeconds * delaySeconds;
-    //         } else {
-    //             clearInterval( timer );
-    //             timer = null;
-    //         }
-    //     }, 600 * 1000 );// every ten minutes
-    // }
-    //
-    // setTimer();
     while ( true ) {
 
         const sqsAttributes = await sqs.getQueueAttributes( {
@@ -43,14 +24,13 @@ const ec2 = new AWS.EC2();
         const instanceReservations = await ec2.describeInstances( {} ).promise();
         const instances            = instanceReservations.Reservations.map( reservation => reservation.Instances[ 0 ] ).filter( instance => [ "pending", "running", "stopping", "stopped" ].includes( instance.State.Name ) );
 
-        const apptierInstances = instances.filter( instance => !!instance.Tags.find( tag => tag.Key === 'Name' && tag.Value === 'apptier' ) );
+        const apptierInstances = instances.filter( instance => !!instance.Tags.find( tag => tag.Key === 'Type' && tag.Value === config.EC2_INSTANT_TYPE_APP ) );
         const activeInstances  = apptierInstances.filter( instance => [ "pending", "running" ].includes( instance.State.Name ) );
         const stoppedInstances = apptierInstances.filter( instance => [ "stopping", "stopped" ].includes( instance.State.Name ) );
         const toStart          = [];
+        const openIndexes      = [ ...Array( 11 ).keys() ].slice( 1 ).filter( index => !apptierInstances.find( instance => !!instance.Tags.find( tag => tag.Key === 'Name' && tag.Value === `${ config.EC2_INSTANT_TYPE_APP }${ index }` ) ) );
 
         if ( queueLength > 0 ) {
-            // setTimer();
-
             let apptierCount = apptierInstances.length;
             let activeCount  = activeInstances.length;
 
@@ -80,7 +60,7 @@ const ec2 = new AWS.EC2();
                 //create ec2
                 while ( activeCount < queueLength && apptierCount < 20 ) {
                     try {
-                        promises.push( createApptier() );
+                        promises.push( createApptier( openIndexes.shift() ) );
                         log( 'creating new' );
                         activeCount++;
                         apptierCount++;
@@ -92,7 +72,6 @@ const ec2 = new AWS.EC2();
                 await Promise.all( promises.map( p => p.catch( e => e ) ) );
             }
         }
-
 
         await manageStalled( ec2, activeInstances );
 
