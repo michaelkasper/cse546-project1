@@ -30,7 +30,7 @@ const ec2 = new AWS.EC2();
             if ( request_id in pending ) {
                 const request = pending[ request_id ];
                 log( 'completing:', request.i );
-                request.res.send( error ? "unknown error occurred" : `(${ request.file }, ${ pred_class })` );
+                request.res.send( error ? "unknown error occurred" : `(${ request.file.split( '.' ).slice( 0, -1 ).join( '.' ) }, ${ pred_class })` );
                 delete pending[ request_id ];
                 return true;
             }
