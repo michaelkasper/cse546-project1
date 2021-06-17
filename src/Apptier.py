@@ -25,7 +25,7 @@ try:
 except:
     current_instance_id = None
 
-timerLength = 20
+timerLength = 60
 sleepLength = 2
 running = True
 
