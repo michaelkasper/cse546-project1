@@ -68,13 +68,11 @@ const ec2 = new AWS.EC2();
         req.setTimeout( 0 );
         try {
             await sqs.sendMessage( {
-                MessageBody           : JSON.stringify( {
+                MessageBody: JSON.stringify( {
                     s3key    : req.file.key,
                     requestId: req.id
                 } ),
-                MessageDeduplicationId: req.id,
-                MessageGroupId        : 'input',
-                QueueUrl              : config.SQS_INPUT_URL
+                QueueUrl   : config.SQS_INPUT_URL
             } ).promise();
 
             log( `SENT: ${ req.id }` );

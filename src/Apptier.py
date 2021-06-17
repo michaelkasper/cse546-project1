@@ -95,8 +95,6 @@ if __name__ == "__main__":
             # send output class to response queue
             sqs.send_message(
                 QueueUrl=config['SQS_OUTPUT_URL'],
-                MessageGroupId="OutMessage",
-                MessageDeduplicationId=request_id,
                 MessageBody=json.dumps({
                     'pred_class': predicted_class,
                     'request_id': request_id
