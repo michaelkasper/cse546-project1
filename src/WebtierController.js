@@ -12,6 +12,33 @@ const ec2 = new AWS.EC2();
 
     log( '-----STARTING CONTROLLER-----' );
 
+    /**
+     * Cool-down timer so controller can go into an idol state if no traffic.
+     * need to be rest {setTimer();} whenever queueLength > 0
+     */
+    // let timer        = null;
+    //
+    // const setTimer = () => {
+    //     if ( timer ) {
+    //         clearInterval( timer );
+    //     }
+    //
+    //     delaySeconds = 2;
+    //     timer        = setInterval( () => {
+    //         if ( delaySeconds < 256 ) {// max delay 4.2 min
+    //             delaySeconds = delaySeconds * delaySeconds;
+    //         } else {
+    //             clearInterval( timer );
+    //             timer = null;
+    //         }
+    //     }, 600 * 1000 );// every ten minutes
+    // }
+    //
+    // setTimer();
+    /**
+     *
+     */
+
     let delaySeconds = 2;
     while ( true ) {
 
@@ -28,7 +55,7 @@ const ec2 = new AWS.EC2();
         const activeInstances  = apptierInstances.filter( instance => [ "pending", "running" ].includes( instance.State.Name ) );
         const stoppedInstances = apptierInstances.filter( instance => [ "stopping", "stopped" ].includes( instance.State.Name ) );
         const toStart          = [];
-        const openIndexes      = [ ...Array( 11 ).keys() ].slice( 1 ).filter( index => !apptierInstances.find( instance => !!instance.Tags.find( tag => tag.Key === 'Name' && tag.Value === `${ config.EC2_INSTANT_TYPE_APP }${ index }` ) ) );
+        const openIndexes      = [ ...Array( 21 ).keys() ].slice( 1 ).filter( index => !apptierInstances.find( instance => !!instance.Tags.find( tag => tag.Key === 'Name' && tag.Value === `${ config.EC2_INSTANT_TYPE_APP }${ index }` ) ) );
 
         if ( queueLength > 0 ) {
             let apptierCount = apptierInstances.length;
