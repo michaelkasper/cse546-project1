@@ -76,7 +76,7 @@ const ec2 = new AWS.EC2();
             log( `SENT: ${ req.id }` );
 
             count++;
-            pending[ req.id ] = { res, i };
+            pending[ req.id ] = { res, count };
         } catch ( error ) {
             log( error );
             res.send( "We ran into an error. Please try again." );
