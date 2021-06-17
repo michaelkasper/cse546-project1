@@ -48,10 +48,6 @@ const ec2 = new AWS.EC2();
         const stoppedInstances = apptierInstances.filter( instance => [ "stopping", "stopped" ].includes( instance.State.Name ) );
         const toStart          = [];
 
-
-        console.log( 'queueLength', queueLength );
-        console.log( 'apptierInstances', apptierInstances.length );
-
         if ( queueLength > 0 ) {
             setTimer();
 
