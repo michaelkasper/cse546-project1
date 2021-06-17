@@ -28,7 +28,7 @@ const ec2 = new AWS.EC2();
                 const { pred_class, request_id, error } = JSON.parse( message.Body );
                 if ( request_id in pending ) {
                     const res = pending[ request_id ].response;
-                    console.log( 'completing:', pending[ request_id ].i );
+                    log( 'completing:', pending[ request_id ].i );
                     res.send( error ? "unknown error occurred" : pred_class );
                     delete pending[ request_id ];
                     sqsConsumer.stop();
