@@ -18,37 +18,35 @@ const ec2 = new AWS.EC2();
 
     const instanceId = await CurrentInstanceId();
 
-    let count        = 0;
-    const pending    = {};
-    const addPending = ( requestId, response, i ) => {
-        const sqsConsumer = Consumer.create( {
-            sqs          : sqs,
-            queueUrl     : config.SQS_OUTPUT_URL,
-            handleMessage: async ( message ) => {
-                const { pred_class, request_id, error } = JSON.parse( message.Body );
-                if ( request_id in pending ) {
-                    const res = pending[ request_id ].response;
-                    log( 'completing:', pending[ request_id ].i );
-                    res.send( error ? "unknown error occurred" : pred_class );
-                    delete pending[ request_id ];
-                    sqsConsumer.stop();
-                    return true;
-                }
-                return false;
-            },
-        } );
+    let count     = 0;
+    const pending = {};
 
-        sqsConsumer.on( 'error', ( err ) => {
-            logError( err.message );
-        } );
+    const sqsConsumer = Consumer.create( {
+        sqs          : sqs,
+        queueUrl     : config.SQS_OUTPUT_URL,
+        batchSize    : 10,
+        handleMessage: async ( message ) => {
+            const { pred_class, request_id, error } = JSON.parse( message.Body );
+            if ( request_id in pending ) {
+                const res = pending[ request_id ].response;
+                log( 'completing:', pending[ request_id ].i );
+                res.send( error ? "unknown error occurred" : pred_class );
+                delete pending[ request_id ];
+                return true;
+            }
+            return false;
+        },
+    } );
 
-        sqsConsumer.on( 'processing_error', ( err ) => {
-            logError( err.message );
-        } );
+    sqsConsumer.on( 'error', ( err ) => {
+        logError( err.message );
+    } );
 
-        pending[ requestId ] = { response, i };
-        sqsConsumer.start();
-    }
+    sqsConsumer.on( 'processing_error', ( err ) => {
+        logError( err.message );
+    } );
+
+    sqsConsumer.start();
 
 
     const upload = multer( {
@@ -76,7 +74,9 @@ const ec2 = new AWS.EC2();
             } ).promise();
 
             log( `SENT: ${ req.id }` );
-            addPending( req.id, res, ++count );
+
+            count++;
+            pending[ req.id ] = { res, i };
         } catch ( error ) {
             log( error );
             res.send( "We ran into an error. Please try again." );
