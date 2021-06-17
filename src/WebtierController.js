@@ -13,25 +13,25 @@ const ec2 = new AWS.EC2();
     log( '-----STARTING CONTROLLER-----' );
 
     let delaySeconds = 2;
-    let timer        = null;
-
-    const setTimer = () => {
-        if ( timer ) {
-            clearInterval( timer );
-        }
-
-        delaySeconds = 2;
-        timer        = setInterval( () => {
-            if ( delaySeconds < 256 ) {// max delay 4.2 min
-                delaySeconds = delaySeconds * delaySeconds;
-            } else {
-                clearInterval( timer );
-                timer = null;
-            }
-        }, 600 * 1000 );// every ten minutes
-    }
-
-    setTimer();
+    // let timer        = null;
+    //
+    // const setTimer = () => {
+    //     if ( timer ) {
+    //         clearInterval( timer );
+    //     }
+    //
+    //     delaySeconds = 2;
+    //     timer        = setInterval( () => {
+    //         if ( delaySeconds < 256 ) {// max delay 4.2 min
+    //             delaySeconds = delaySeconds * delaySeconds;
+    //         } else {
+    //             clearInterval( timer );
+    //             timer = null;
+    //         }
+    //     }, 600 * 1000 );// every ten minutes
+    // }
+    //
+    // setTimer();
     while ( true ) {
 
         const sqsAttributes = await sqs.getQueueAttributes( {
@@ -49,7 +49,7 @@ const ec2 = new AWS.EC2();
         const toStart          = [];
 
         if ( queueLength > 0 ) {
-            setTimer();
+            // setTimer();
 
             let apptierCount = apptierInstances.length;
             let activeCount  = activeInstances.length;
