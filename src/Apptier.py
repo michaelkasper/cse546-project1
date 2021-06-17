@@ -50,6 +50,22 @@ def get_response():
 
 
 if __name__ == "__main__":
+
+    if current_instance_id is not None:
+        ec2.create_tags(
+            Resources=[current_instance_id],
+            Tags=[
+                {
+                    'Key': 'Name',
+                    'Value': 'apptier'
+                },
+                {
+                    'Key': 'Status',
+                    'Value': 'ready'
+                }
+            ]
+        )
+
     theTimer = Timer(timerLength, timerEnd, ())
     theTimer.start()
 
@@ -107,6 +123,16 @@ if __name__ == "__main__":
             time.sleep(sleepLength)
 
 if current_instance_id is not None:
+    ec2.create_tags(
+        Resources=[current_instance_id],
+        Tags=[
+            {
+                'Key': 'Status',
+                'Value': 'paused'
+            }
+        ]
+    )
+
     response = ec2.stop_instances(
         InstanceIds=[
             current_instance_id,

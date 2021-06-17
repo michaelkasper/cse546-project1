@@ -2,6 +2,7 @@ const AWS = require( 'aws-sdk' );
 
 const {
           DEBUG,
+          ENV,
           AWS_REGION,
           WEB_PORT,
           WEB_HOSTNAME,
@@ -20,6 +21,7 @@ const {
 AWS.config.update( { region: AWS_REGION || 'us-east-1' } );
 
 module.exports = {
+    ENV,
     SQS_INPUT_URL,
     SQS_OUTPUT_URL,
     AWS_S3_INPUT_BUCKET,

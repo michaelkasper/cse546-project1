@@ -89,19 +89,20 @@ const ec2 = new AWS.EC2();
         log( '-----STARTING WEBAPP-----' );
         log( `Server running at http://${ config.WEB_HOSTNAME }:${ config.WEB_PORT }/` );
 
-        try {
-            ec2.createTags( {
-                Resources: [ instanceId ], Tags: [
-                    {
-                        Key  : 'Status',
-                        Value: 'ready'
-                    }
-                ]
-            } ).promise();
-        } catch ( err ) {
+        if ( instanceId ) {
+            try {
+                ec2.createTags( {
+                    Resources: [ instanceId ], Tags: [
+                        {
+                            Key  : 'Status',
+                            Value: 'ready'
+                        }
+                    ]
+                } ).promise();
+            } catch ( err ) {
 
+            }
         }
-
     } );
 
 

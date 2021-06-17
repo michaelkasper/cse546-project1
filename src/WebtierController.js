@@ -1,8 +1,9 @@
-const config   = require( './util/config' );
-const { log }  = require( './util/log' );
-const AWS      = require( 'aws-sdk' );
-const fs       = require( 'fs' ).promises;
-const { join } = require( 'path' );
+const config            = require( './util/config' );
+const { log }           = require( './util/log' );
+const { createApptier } = require( './util/createApptier' );
+const { manageStalled } = require( './util/manageStalled' );
+const { manageStopped } = require( './util/manageStopped' );
+const AWS               = require( 'aws-sdk' );
 
 const sqs = new AWS.SQS();
 const ec2 = new AWS.EC2();
@@ -11,17 +12,27 @@ const ec2 = new AWS.EC2();
 
     log( '-----STARTING CONTROLLER-----' );
 
-    const scriptPath   = join( process.cwd(), 'src', 'scripts', 'processor.boot.sh' );
-    const bootScript   = await fs.readFile( scriptPath, 'utf8' );
-    const stopLog      = {};
-    let pendingLog     = {};
-    let toStart        = [];
-    let toTerminate    = [];
-    let delaySeconds   = 2;
-    let noMessageCount = 0;
+    let delaySeconds = 2;
+    let timer        = null;
 
+    const setTimer = () => {
+        if ( timer ) {
+            clearInterval( timer );
+        }
+
+        delaySeconds = 2;
+        timer        = setInterval( () => {
+            if ( delaySeconds < 256 ) {// max delay 4.2 min
+                delaySeconds = delaySeconds * delaySeconds;
+            } else {
+                clearInterval( timer );
+                timer = null;
+            }
+        }, 600 * 1000 );// every ten minutes
+    }
+
+    setTimer();
     while ( true ) {
-        toStart = [];
 
         const sqsAttributes = await sqs.getQueueAttributes( {
             QueueUrl      : config.SQS_INPUT_URL,
@@ -30,114 +41,66 @@ const ec2 = new AWS.EC2();
 
         const queueLength          = sqsAttributes.Attributes.ApproximateNumberOfMessages;
         const instanceReservations = await ec2.describeInstances( {} ).promise();
-        const instances            = instanceReservations.Reservations.map( reservation => reservation.Instances[ 0 ] );
+        const instances            = instanceReservations.Reservations.map( reservation => reservation.Instances[ 0 ] ).filter( instance => [ "pending", "running", "stopping", "stopped" ].includes( instance.State.Name ) );
 
-        const processorInstances = instances.filter( instance => !!instance.Tags.find( tag => tag.Key === 'Name' && tag.Value === 'apptier' ) );
-        const activeInstances    = processorInstances.filter( instance => [ "pending", "running" ].includes( instance.State.Name ) );
-        const stoppedInstances   = processorInstances.filter( instance => [ "stopping", "stopped" ].includes( instance.State.Name ) && !toTerminate.includes( instance.InstanceId ) );
+        const apptierInstances = instances.filter( instance => !!instance.Tags.find( tag => tag.Key === 'Name' && tag.Value === 'apptier' ) );
+        const activeInstances  = apptierInstances.filter( instance => [ "pending", "running" ].includes( instance.State.Name ) );
+        const stoppedInstances = apptierInstances.filter( instance => [ "stopping", "stopped" ].includes( instance.State.Name ) );
+        const toStart          = [];
+
+
+        console.log( 'queueLength', queueLength );
+        console.log( 'apptierInstances', apptierInstances.length );
 
         if ( queueLength > 0 ) {
-            noMessageCount = 0;
-            delaySeconds   = 2;
-            let count      = activeInstances.length;
-            if ( count < queueLength ) {
+            setTimer();
+
+            let apptierCount = apptierInstances.length;
+            let activeCount  = activeInstances.length;
+
+            if ( activeCount < queueLength ) {
+                const promises = []
 
                 //boot stopped
-                while ( count < queueLength && count <= 20 && stoppedInstances.length > 0 ) {
-                    const instanceId = stoppedInstances.pop().InstanceId;
-                    toStart.push( instanceId );
-                    delete stopLog[ instanceId ];
-                    count++;
+                while ( activeCount < queueLength && stoppedInstances.length > 0 ) {
+                    const instance = stoppedInstances.pop();
+                    toStart.push( instance.InstanceId );
+                    activeCount++;
                 }
 
                 try {
                     if ( toStart.length > 0 ) {
-                        const r = await ec2.startInstances( {
-                            InstanceIds: toStart
-                        } ).promise();
+                        promises.push(
+                            ec2.startInstances( {
+                                InstanceIds: toStart
+                            } ).promise()
+                        );
+                        log( 'starting: ', toStart.length );
                     }
                 } catch ( err ) {
                     log( 'start', err )
                 }
 
                 //create ec2
-                while ( count < queueLength && count <= 20 ) {
+                while ( activeCount < queueLength && apptierCount < 20 ) {
                     try {
-                        const result = await ec2.runInstances( {
-                            ImageId           : config.AWS_EC2_AMI,
-                            InstanceType      : 't2.micro',
-                            IamInstanceProfile: {
-                                Arn: config.AWS_EC2_IAM_PROFILE
-                            },
-                            MinCount          : 1,
-                            MaxCount          : 1,
-                            UserData          : Buffer.from( bootScript ).toString( 'base64' ),
-                            KeyName           : config.AWS_EC2_KEYNAME,
-                            SecurityGroupIds  : [ config.AWS_EC2_PROCESSOR_SECURITY_GROUPID ]
-                        } ).promise();
-
-                        const newInstanceId = result.Instances[ 0 ].InstanceId;
-
-                        await ec2.createTags( {
-                            Resources: [ newInstanceId ], Tags: [
-                                {
-                                    Key  : 'Name',
-                                    Value: 'apptier'
-                                }
-                            ]
-                        } ).promise();
-
-                        count++;
+                        promises.push( createApptier() );
+                        log( 'creating new' );
+                        activeCount++;
+                        apptierCount++;
                     } catch ( err ) {
                         log( 'create', err )
                     }
                 }
-            }
-        } else {
-            noMessageCount++;
-        }
 
-        toTerminate            = [];
-        const pendingInstances = activeInstances.filter( instance => [ "pending" ].includes( instance.State.Name ) );
-        const oldPendingLog    = { ...pendingLog };
-        pendingLog             = {};
-        pendingInstances.forEach( instance => {
-            pendingLog[ instance.InstanceId ] = !oldPendingLog[ instance.InstanceId ] ? Date.now() : oldPendingLog[ instance.InstanceId ];
-
-            const MINUTE = 1000;
-            if ( pendingLog[ instance.InstanceId ] < Date.now() - ( MINUTE ) ) {
-                toTerminate.push( instance.InstanceId );
-            }
-        } );
-
-
-        // terminate instances that have been stopped for more then 2 hours
-        stoppedInstances.filter( instance => !toStart.includes( instance.InstanceId ) ).forEach( instance => {
-            if ( !stopLog[ instance.InstanceId ] ) {
-                stopLog[ instance.InstanceId ] = Date.now();
-            }
-
-            //if stopped for 2 hours or more, terminate
-            const HOUR = 1000 * 60 * 60;
-            if ( stopLog[ instance.InstanceId ] < Date.now() - ( 2 * HOUR ) ) {
-                toTerminate.push( instance.InstanceId );
-                delete stopLog[ instance.InstanceId ];
-            }
-        } );
-
-        if ( toTerminate.length > 0 ) {
-            await ec2.terminateInstances( {
-                InstanceIds: toTerminate
-            } ).promise();
-        }
-
-
-        //every ten minutes we double the delay time
-        if ( noMessageCount > 0 && noMessageCount % 300 === 0 ) {
-            if ( delaySeconds < 256 ) {// max delay 4.2 min
-                delaySeconds = delaySeconds * delaySeconds;
+                await Promise.all( promises.map( p => p.catch( e => e ) ) );
             }
         }
+
+
+        await manageStalled( ec2, activeInstances );
+
+        await manageStopped( ec2, stoppedInstances );
 
         await new Promise( r => setTimeout( r, delaySeconds * 1000 ) );
     }

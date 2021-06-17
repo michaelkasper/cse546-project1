@@ -4,15 +4,16 @@
   "description": "",
   "main": "app/Webtier.js",
   "scripts": {
-    "test": "python3 testers/workload_generator.py --num_request 100 --url 'http://ec2-100-25-157-169.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\" | gnomon --type=elapsed-total",
-    "test:bulk": "python3 testers/multithread_workload_generator.py --num_request 100 --url 'http://ec2-100-25-157-169.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\" | gnomon --type=elapsed-total",
+    "test": "python3 testers/workload_generator.py --num_request 1 --url 'http://ec2-3-90-81-125.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\" | gnomon --type=elapsed-total",
+    "test:bulk": "python3 testers/multithread_workload_generator.py --num_request 100 --url 'http://ec2-3-90-81-125.compute-1.amazonaws.com:3000' --image_folder \"testers/images/\" | gnomon --type=elapsed-total",
     "test:local": "python3 testers/workload_generator.py --num_request 30 --url 'http://localhost:3000' --image_folder \"testers/images/\"",
-    "test:local:bulk": "python3 testers/multithread_workload_generator.py --num_request 30 --url 'http://localhost:3000' --image_folder \"testers/images/\"",
+    "test:local:bulk": "python3 testers/multithread_workload_generator.py --num_request 100 --url 'http://localhost:3000' --image_folder \"testers/images/\"",
     "webtier": "env-cmd --fallback -f ./.env.local node src/Webtier.js",
     "apptier": "sudo PYTHONUSERBASE=/home/ubuntu/.local python3 src/Apptier.py",
+    "apptier:local": "python3 src/Apptier.py",
     "webcontroller": "env-cmd --fallback -f ./.env.local node src/WebtierController.js",
-    "create-web": "env-cmd --fallback -f ./.env.local node src/util/CreateWebtier.js",
-    "create-app": "env-cmd --fallback -f ./.env.local node src/util/CreateApptier.js",
+    "create-web": "env-cmd --fallback -f ./.env.local node src/util/createWebtier.js initiate",
+    "create-app": "env-cmd --fallback -f ./.env.local node src/util/createApptier.js initiate",
     "start": "concurrently --kill-others \"npm run webtier\" \"npm run webcontroller\""
   },
   "author": "",
@@ -26,9 +27,9 @@
     "express": "^4.17.1",
     "express-request-id": "^1.4.1",
     "gnomon": "^1.5.0",
+    "moment": "^2.29.1",
     "multer": "^1.4.2",
     "multer-s3": "^2.9.0",
-    "sqs-consumer": "^5.5.0",
-    "uuid": "^8.3.2"
+    "sqs-consumer": "^5.5.0"
   }
 }

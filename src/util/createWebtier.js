@@ -1,15 +1,12 @@
-const config   = require( './config' );
-const AWS      = require( 'aws-sdk' );
-const fs       = require( 'fs' ).promises;
-const { join } = require( 'path' );
+const { getBootScript } = require( './getBootScript' );
 
-const ec2 = new AWS.EC2();
+const config = require( './config' );
+const AWS    = require( 'aws-sdk' );
+const ec2    = new AWS.EC2();
 
+const createWebtier = async () => {
 
-( async () => {
-
-    const scriptPath = join( process.cwd(), 'src', 'scripts', 'webserver.boot.sh' );
-    const bootScript = await fs.readFile( scriptPath, 'utf8' );
+    const bootScript = await getBootScript( 'webtier' );
 
     const result = await ec2.runInstances( {
         ImageId           : config.AWS_EC2_AMI,
@@ -26,6 +23,8 @@ const ec2 = new AWS.EC2();
 
     const newInstanceId = result.Instances[ 0 ].InstanceId;
 
+    await new Promise( r => setTimeout( r, 10000 ) );
+
     await ec2.createTags( {
         Resources: [ newInstanceId ], Tags: [
             {
@@ -38,5 +37,12 @@ const ec2 = new AWS.EC2();
             }
         ]
     } ).promise();
+};
 
-} )();
+module.exports.createWebtier = createWebtier;
+
+switch ( process.argv[ 2 ] ) {
+    case 'initiate':
+        createWebtier();
+        break;
+}
