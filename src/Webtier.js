@@ -28,9 +28,9 @@ const ec2 = new AWS.EC2();
         handleMessage: async ( message ) => {
             const { pred_class, request_id, error } = JSON.parse( message.Body );
             if ( request_id in pending ) {
-                const res = pending[ request_id ].response;
-                log( 'completing:', pending[ request_id ].i );
-                res.send( error ? "unknown error occurred" : pred_class );
+                const request = pending[ request_id ];
+                log( 'completing:', request.i );
+                request.res.send( error ? "unknown error occurred" : `(${ request.file }, ${ pred_class })` );
                 delete pending[ request_id ];
                 return true;
             }
@@ -76,7 +76,7 @@ const ec2 = new AWS.EC2();
             log( `SENT: ${ req.id }` );
 
             count++;
-            pending[ req.id ] = { res, count };
+            pending[ req.id ] = { file: req.file.key, res, count };
         } catch ( error ) {
             log( error );
             res.send( "We ran into an error. Please try again." );
