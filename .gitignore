@@ -4,4 +4,4 @@ node_modules
 /testers/
 /local_python
 /*.JPEG
-results.txt
+AWS_CREDENTIALS
